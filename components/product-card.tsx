@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ChevronRight, ShieldCheck, RotateCcw, Wrench } from "lucide-react";
+import { ChevronRight, ShieldCheck, RotateCcw } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ProductStatusBadge } from "@/components/status-badge";
 import {
@@ -15,6 +15,7 @@ import type { Product, RiskLevel } from "@/lib/types";
 import { cn, formatCurrencyTRY, formatDateTR } from "@/lib/utils";
 import { humanizeDaysLeft } from "@/lib/date-utils";
 
+// Düşük risk: şerit gizli — gereksiz görsel gürültü yapma.
 const RISK_STRIPE: Record<RiskLevel, string> = {
   low: "bg-transparent",
   medium: "bg-warn-400",
@@ -33,7 +34,6 @@ export function ProductCard({
   const w = warrantyStatus(product, warrantyWarnDays);
   const r = returnStatus(product, returnWarnDays);
   const risk = riskLevel(product);
-  const openService = product.serviceRecords.some((s) => s.status !== "resolved");
 
   return (
     <Link
@@ -53,11 +53,6 @@ export function ProductCard({
           <div className="flex items-center gap-1.5 mb-1.5 flex-wrap">
             <Badge tone="neutral">{product.category}</Badge>
             <ProductStatusBadge status={product.status} />
-            {openService && (
-              <Badge tone="info" dot>
-                <Wrench className="h-3 w-3 -ml-0.5" /> Servis
-              </Badge>
-            )}
           </div>
           <h3 className="text-base font-semibold text-ink-900 truncate">
             {product.name}

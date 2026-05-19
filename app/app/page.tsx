@@ -21,14 +21,14 @@ import { EmptyState } from "@/components/empty-state";
 import { Button } from "@/components/ui/button";
 import { useAldimStore } from "@/lib/store";
 import { daysUntil, humanizeDaysLeft } from "@/lib/date-utils";
-import { riskLevel } from "@/lib/status";
+import { RETURN_STATUS_LABEL, riskLevel } from "@/lib/status";
 
 interface DashboardAlert {
   id: string;
   productId: string;
   title: string;
   description?: string;
-  tone: "warn" | "danger" | "info";
+  tone: "warn" | "info";
   icon: React.ReactNode;
 }
 
@@ -56,6 +56,8 @@ export default function DashboardPage() {
     for (const p of products) {
       const returnLeft = daysUntil(p.returnDeadline);
       const warrantyLeft = daysUntil(p.warrantyEndDate);
+
+      // 1) İade süresi yaklaşan (aktif iade süreci henüz açılmamış)
       if (
         returnLeft >= 0 &&
         returnLeft <= settings.returnWarnDays &&
@@ -66,20 +68,36 @@ export default function DashboardPage() {
           productId: p.id,
           title: `${p.name} için iade süresi ${humanizeDaysLeft(p.returnDeadline).toLowerCase()}.`,
           description: "İade kararını verip mesajını şimdi gönderebilirsin.",
-          tone: returnLeft <= 2 ? "danger" : "warn",
+          tone: "warn",
           icon: <RotateCcw className="h-4 w-4" />,
         });
       }
+
+      // 2) Aktif iade süreci — takip et
+      if (p.returnProcess && p.returnProcess.status !== "completed") {
+        arr.push({
+          id: `ra_${p.id}`,
+          productId: p.id,
+          title: `${p.name} için iade süreci açık.`,
+          description: `Durum: ${RETURN_STATUS_LABEL[p.returnProcess.status]}.`,
+          tone: "info",
+          icon: <RotateCcw className="h-4 w-4" />,
+        });
+      }
+
+      // 3) Garanti süresi yaklaşan
       if (warrantyLeft >= 0 && warrantyLeft <= settings.warrantyWarnDays) {
         arr.push({
           id: `w_${p.id}`,
           productId: p.id,
           title: `${p.name} garantisi ${humanizeDaysLeft(p.warrantyEndDate).toLowerCase()}.`,
           description: "Garanti hakkını kullanmak için süre bitmeden başvurmayı düşün.",
-          tone: warrantyLeft <= 7 ? "danger" : "warn",
+          tone: "warn",
           icon: <ShieldCheck className="h-4 w-4" />,
         });
       }
+
+      // 4) Açık servis kaydı
       const openService = p.serviceRecords.find((s) => s.status !== "resolved");
       if (openService) {
         arr.push({
@@ -91,9 +109,12 @@ export default function DashboardPage() {
           icon: <Wrench className="h-4 w-4" />,
         });
       }
+
+      // Not: "İade süresi geçti ama süreç başlatılmamış" durumda alert
+      // ÜRETMİYORUZ — kullanıcının yapabileceği bir aksiyon yok.
     }
-    // Tehlike öncelikli sırala
-    const order = { danger: 0, warn: 1, info: 2 } as const;
+    // Önce uyarı (warn), sonra takip (info)
+    const order = { warn: 0, info: 1 } as const;
     return arr.sort((a, b) => order[a.tone] - order[b.tone]).slice(0, 5);
   }, [products, settings]);
 
@@ -131,25 +152,25 @@ export default function DashboardPage() {
           href="/app/products/new"
           icon={<Plus className="h-5 w-5" />}
           title="Ürün ekle"
-          description="Yeni bir alışverişi sisteme tanıt."
+          description="Yeni aldığın ürünü ekle."
         />
         <QuickActionCard
           href="/app/documents"
           icon={<Receipt className="h-5 w-5" />}
           title="Belgeleri gör"
-          description="Tüm fatura ve belgelerine ulaş."
+          description="Fatura ve belgelerine ulaş."
         />
         <QuickActionCard
           href="/app/returns"
           icon={<RotateCcw className="h-5 w-5" />}
-          title="İade takip"
+          title="İade takibi"
           description="Devam eden iadelerini yönet."
         />
         <QuickActionCard
           href="/app/products"
           icon={<ShieldCheck className="h-5 w-5" />}
-          title="Garanti kontrol"
-          description="Süresi yaklaşan ürünlere odaklan."
+          title="Garanti kontrolü"
+          description="Süresi yaklaşan ürünleri gör."
         />
       </section>
 
@@ -172,7 +193,7 @@ export default function DashboardPage() {
           label="İade süresi yaklaşan"
           value={stats.returnSoon}
           icon={<RotateCcw className="h-5 w-5" />}
-          tone={stats.returnSoon > 0 ? "danger" : "neutral"}
+          tone={stats.returnSoon > 0 ? "warn" : "neutral"}
           hint={`Eşik: ${settings.returnWarnDays} gün`}
         />
         <StatCard

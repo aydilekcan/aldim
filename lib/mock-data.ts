@@ -124,6 +124,48 @@ export const MOCK_PRODUCTS: Product[] = [
     ],
     serviceRecords: [],
   },
+  {
+    id: "p_dyson_v15",
+    name: "Elektrikli Süpürge",
+    brand: "Dyson",
+    category: "Ev elektroniği",
+    store: "Teknosa",
+    price: 18999,
+    purchaseDate: "2024-09-15",
+    warrantyEndDate: "2026-09-15",
+    returnDeadline: "2024-09-29",
+    invoiceNumber: "TKN-2024-99812",
+    status: "in_service",
+    notes: "Motor sesi normalden yüksek, garanti kapsamında servise gönderildi.",
+    documents: [
+      {
+        id: "d_dyson_invoice",
+        productId: "p_dyson_v15",
+        name: "Teknosa Faturası.pdf",
+        type: "invoice",
+        date: "2024-09-15",
+      },
+      {
+        id: "d_dyson_warranty",
+        productId: "p_dyson_v15",
+        name: "Dyson Garanti Belgesi.pdf",
+        type: "warranty",
+        date: "2024-09-15",
+      },
+    ],
+    serviceRecords: [
+      {
+        id: "s_dyson_001",
+        productId: "p_dyson_v15",
+        date: "2026-05-12",
+        company: "Dyson Yetkili Servis - Maslak",
+        description: "Motor sesi yüksek, garanti kapsamında inceleme talebi.",
+        status: "in_progress",
+        hasServiceForm: true,
+        nextFollowUpDate: "2026-05-25",
+      },
+    ],
+  },
 ];
 
 export const DEFAULT_SETTINGS: AppSettings = {

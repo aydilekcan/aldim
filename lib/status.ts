@@ -76,7 +76,6 @@ export function computeProductStatus(
   p: Pick<Product, "warrantyEndDate" | "returnDeadline" | "returnProcess" | "serviceRecords" | "status">,
   warnDays = 30,
 ): ProductStatus {
-  // Açık servis kaydı varsa en güçlü sinyal.
   const openService = p.serviceRecords?.some((s) => s.status !== "resolved");
   if (openService) return "in_service";
   if (p.returnProcess && p.returnProcess.status !== "completed") {
@@ -90,6 +89,11 @@ export function computeProductStatus(
   return "active";
 }
 
+/**
+ * Risk seviyesi yalnızca KULLANICININ AKSİYON ALABİLECEĞİ durumlara göre
+ * hesaplanır. Süresi çoktan geçmiş ve aksiyon alınamayacak durumlar
+ * "low" olarak değerlendirilir — dashboard'da panik yaratmasın.
+ */
 export function riskLevel(
   p: Pick<
     Product,
@@ -99,27 +103,41 @@ export function riskLevel(
   const warrantyLeft = daysUntil(p.warrantyEndDate);
   const returnLeft = daysUntil(p.returnDeadline);
   const hasOpenService = p.serviceRecords?.some((s) => s.status !== "resolved");
-  const inReturn = p.returnProcess && p.returnProcess.status !== "completed";
+  const hasActiveReturn =
+    p.returnProcess && p.returnProcess.status !== "completed";
 
+  // Yüksek: aktif aksiyon gereken durumlar
   if (
     hasOpenService ||
-    inReturn ||
-    (returnLeft >= 0 && returnLeft <= 3) ||
+    hasActiveReturn ||
+    (returnLeft >= 0 && returnLeft <= 7 && !p.returnProcess) ||
     (warrantyLeft >= 0 && warrantyLeft <= 15)
   ) {
     return "high";
   }
+
+  // Orta: yakın gelecekte aksiyon gerekecek
   if (
-    (returnLeft >= 0 && returnLeft <= 10) ||
-    (warrantyLeft >= 0 && warrantyLeft <= 60)
+    (returnLeft > 7 && returnLeft <= 14 && !p.returnProcess) ||
+    (warrantyLeft > 15 && warrantyLeft <= 30)
   ) {
     return "medium";
   }
+
+  // Düşük: süresi geçmiş ama aksiyon alınamaz, garanti aktif vb.
   return "low";
 }
 
 export type Tone = "neutral" | "success" | "warn" | "danger" | "info";
 
+/**
+ * Ton stratejisi:
+ *  - success: ürün sağlıklı, aksiyon gerekmez
+ *  - warn:   süresi yaklaşan, dikkat
+ *  - info:   aktif süreç (servis, iade) — takip ediliyor
+ *  - neutral: süresi geçmiş ve aksiyon alınamaz — panik üretme
+ *  - danger: yalnızca gerçekten kritik aksiyonlar (acil son tarih) için ayrılı
+ */
 export function productStatusTone(s: ProductStatus): Tone {
   switch (s) {
     case "active":
@@ -131,7 +149,7 @@ export function productStatusTone(s: ProductStatus): Tone {
       return "info";
     case "warranty_expired":
     case "return_expired":
-      return "danger";
+      return "neutral";
   }
 }
 
@@ -140,12 +158,13 @@ export function returnStatusTone(s: ReturnStatus): Tone {
     case "eligible":
       return "success";
     case "deadline_soon":
+      return "warn";
     case "requested":
     case "shipped":
     case "refund_pending":
-      return "warn";
+      return "info";
     case "deadline_passed":
-      return "danger";
+      return "neutral";
     case "completed":
       return "success";
   }
@@ -158,6 +177,6 @@ export function warrantyStatusTone(s: WarrantyStatus): Tone {
     case "expiring_soon":
       return "warn";
     case "expired":
-      return "danger";
+      return "neutral";
   }
 }
