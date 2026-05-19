@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  /* Bottom navigation toplam yüksekliği — alt boşlukları hesaplarken kullanılır */
+  --bottom-nav-h: calc(3.5rem + env(safe-area-inset-bottom, 0px));
+}
+
+html,
+body {
+  background-color: #F8FAFC;
+  color: #0F172A;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* iOS safe area + alt navigation için padding */
+.safe-bottom {
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.25rem);
+}
+
+/* Mobil alt nav görünürken içerik onun altında kalmasın */
+@media (max-width: 767px) {
+  .with-bottom-nav {
+    padding-bottom: calc(var(--bottom-nav-h) + 1.25rem);
+  }
+}
+
+/* Yumuşak fokus halkası */
+*:focus-visible {
+  outline: 2px solid #2F5495;
+  outline-offset: 2px;
+  border-radius: 0.5rem;
+}
+
+/* Mobilde dokunma alanlarında hover'ı bastır */
+@media (hover: none) {
+  .hover\:bg-ink-50:hover {
+    background-color: inherit;
+  }
+}
