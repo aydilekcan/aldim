@@ -4,6 +4,8 @@
 
 Aldım, satın aldığın ürünlerin faturalarını, garanti sürelerini, iade haklarını ve servis kayıtlarını tek yerden takip etmeni sağlayan, mobil öncelikli bir alışveriş sonrası asistanıdır.
 
+🔗 **Canlı demo:** https://aldim.vercel.app
+
 > Bu repoda, MVP'nin _ilk kullanıcılarla denenebilecek_ canlı versiyonu yer alır. Veriler şu an tarayıcı tarafında (localStorage) saklanır; gerçek auth, dosya yükleme ve bulut sync sonraki fazda eklenecektir.
 
 ---
