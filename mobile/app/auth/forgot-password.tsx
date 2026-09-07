@@ -36,7 +36,10 @@ export default function ForgotPasswordScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }} edges={["bottom"]}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: colors.white }}
+      edges={["bottom"]}
+    >
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>Şifremi unuttum</Text>
         <Text style={styles.desc}>

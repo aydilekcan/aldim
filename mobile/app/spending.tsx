@@ -1,8 +1,123 @@
-import { ScrollView,Text,View,Pressable } from 'react-native';
-import { useState } from 'react';
-import { useAldimStore } from '../lib/store';
-import { spendingSummary } from '../../shared/domain';
-import { formatCurrencyTRY,formatDateTR } from '../lib/date-utils';
-import { colors } from '../lib/theme';
-import { Card,CardTitle } from '../components/Card';
-export default function Spending(){const {items,payments}=useAldimStore();const [offset,setOffset]=useState(0);const date=new Date();date.setDate(1);date.setMonth(date.getMonth()+offset);const month=`${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}`;const summary=spendingSummary(items,payments,month);const rows=[...items.filter(i=>!['home_bill','subscription'].includes(i.category)&&i.purchaseDate?.startsWith(month)).map(i=>({id:i.id,title:i.title,date:i.purchaseDate!,amount:i.price??0})),...payments.filter(p=>p.paidAt.startsWith(month)).map(p=>({id:p.id,title:p.itemTitle,date:p.paidAt,amount:p.amount}))].sort((a,b)=>b.date.localeCompare(a.date));return <ScrollView contentContainerStyle={{padding:20,gap:18,paddingBottom:40}}><View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}><Pressable accessibilityLabel="Önceki ay" onPress={()=>setOffset(o=>o-1)} style={{padding:14}}><Text>←</Text></Pressable><Text style={{fontSize:17,fontWeight:'600',color:colors.ink[900]}}>{date.toLocaleDateString('tr-TR',{month:'long',year:'numeric'})}</Text><Pressable accessibilityLabel="Sonraki ay" onPress={()=>setOffset(o=>o+1)} style={{padding:14}}><Text>→</Text></Pressable></View><Card><Text style={{color:colors.ink[500]}}>Bu ayki harcaman</Text><Text style={{fontSize:34,fontWeight:'700',color:colors.brand[700],marginVertical:15}}>{formatCurrencyTRY(summary.thisMonth)}</Text><Text style={{color:colors.ink[500]}}>{rows.length} kayıtlı işlem</Text></Card><Card><CardTitle>Harcama geçmişi</CardTitle>{rows.length?rows.map(row=><View key={row.id} style={{flexDirection:'row',gap:12,alignItems:'center',paddingVertical:18,borderBottomWidth:1,borderColor:colors.ink[100]}}><View style={{flex:1}}><Text style={{fontWeight:'600',color:colors.ink[900]}}>{row.title}</Text><Text style={{fontSize:12,color:colors.ink[500],marginTop:7}}>{formatDateTR(row.date)}</Text></View><Text style={{fontWeight:'600',color:colors.ink[900]}}>{formatCurrencyTRY(row.amount)}</Text></View>):<Text style={{paddingVertical:20,color:colors.ink[500]}}>Bu ay kayıtlı harcama yok.</Text>}</Card></ScrollView>;}
+import { ScrollView, Text, View, Pressable } from "react-native";
+import { useState } from "react";
+import { useAldimStore } from "../lib/store";
+import { spendingSummary } from "../../shared/domain";
+import { formatCurrencyTRY, formatDateTR } from "../lib/date-utils";
+import { colors } from "../lib/theme";
+import { Card, CardTitle } from "../components/Card";
+export default function Spending() {
+  const { items, payments } = useAldimStore();
+  const [offset, setOffset] = useState(0);
+  const date = new Date();
+  date.setDate(1);
+  date.setMonth(date.getMonth() + offset);
+  const month = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+  const summary = spendingSummary(items, payments, month);
+  const rows = [
+    ...items
+      .filter(
+        (i) =>
+          !["home_bill", "subscription"].includes(i.category) &&
+          i.purchaseDate?.startsWith(month),
+      )
+      .map((i) => ({
+        id: i.id,
+        title: i.title,
+        date: i.purchaseDate!,
+        amount: i.price ?? 0,
+      })),
+    ...payments
+      .filter((p) => p.paidAt.startsWith(month))
+      .map((p) => ({
+        id: p.id,
+        title: p.itemTitle,
+        date: p.paidAt,
+        amount: p.amount,
+      })),
+  ].sort((a, b) => b.date.localeCompare(a.date));
+  return (
+    <ScrollView
+      contentContainerStyle={{ padding: 20, gap: 18, paddingBottom: 40 }}
+    >
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <Pressable
+          accessibilityLabel="Önceki ay"
+          onPress={() => setOffset((o) => o - 1)}
+          style={{ padding: 14 }}
+        >
+          <Text>←</Text>
+        </Pressable>
+        <Text
+          style={{ fontSize: 17, fontWeight: "600", color: colors.ink[900] }}
+        >
+          {date.toLocaleDateString("tr-TR", { month: "long", year: "numeric" })}
+        </Text>
+        <Pressable
+          accessibilityLabel="Sonraki ay"
+          onPress={() => setOffset((o) => o + 1)}
+          style={{ padding: 14 }}
+        >
+          <Text>→</Text>
+        </Pressable>
+      </View>
+      <Card>
+        <Text style={{ color: colors.ink[500] }}>Bu ayki harcaman</Text>
+        <Text
+          style={{
+            fontSize: 34,
+            fontWeight: "700",
+            color: colors.brand[700],
+            marginVertical: 15,
+          }}
+        >
+          {formatCurrencyTRY(summary.thisMonth)}
+        </Text>
+        <Text style={{ color: colors.ink[500] }}>
+          {rows.length} kayıtlı işlem
+        </Text>
+      </Card>
+      <Card>
+        <CardTitle>Harcama geçmişi</CardTitle>
+        {rows.length ? (
+          rows.map((row) => (
+            <View
+              key={row.id}
+              style={{
+                flexDirection: "row",
+                gap: 12,
+                alignItems: "center",
+                paddingVertical: 18,
+                borderBottomWidth: 1,
+                borderColor: colors.ink[100],
+              }}
+            >
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontWeight: "600", color: colors.ink[900] }}>
+                  {row.title}
+                </Text>
+                <Text
+                  style={{ fontSize: 12, color: colors.ink[500], marginTop: 7 }}
+                >
+                  {formatDateTR(row.date)}
+                </Text>
+              </View>
+              <Text style={{ fontWeight: "600", color: colors.ink[900] }}>
+                {formatCurrencyTRY(row.amount)}
+              </Text>
+            </View>
+          ))
+        ) : (
+          <Text style={{ paddingVertical: 20, color: colors.ink[500] }}>
+            Bu ay kayıtlı harcama yok.
+          </Text>
+        )}
+      </Card>
+    </ScrollView>
+  );
+}

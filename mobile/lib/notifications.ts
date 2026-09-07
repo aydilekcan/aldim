@@ -131,28 +131,59 @@ export async function cancelAllScheduledNotifications(): Promise<void> {
 
 /** Registers this installation for reminders created on any device. */
 export async function registerPushDevice(userId: string): Promise<boolean> {
-  if (Platform.OS === 'web') return false;
+  if (Platform.OS === "web") return false;
   try {
-    const { supabase } = await import('./supabase');
+    const { supabase } = await import("./supabase");
     if (!supabase) return false;
-    const AsyncStorage = (await import('@react-native-async-storage/async-storage')).default;
+    const AsyncStorage = (
+      await import("@react-native-async-storage/async-storage")
+    ).default;
     const key = `aldim:device:${userId}`;
     let id = await AsyncStorage.getItem(key);
-    if (!id) { id = (await import('expo-crypto')).randomUUID(); await AsyncStorage.setItem(key,id); }
-    if (await getNotificationPermissionStatus() !== 'granted') {
-      await supabase.from('device_tokens').update({ enabled:false }).eq('id',id).eq('user_id',userId);
+    if (!id) {
+      id = (await import("expo-crypto")).randomUUID();
+      await AsyncStorage.setItem(key, id);
+    }
+    if ((await getNotificationPermissionStatus()) !== "granted") {
+      await supabase
+        .from("device_tokens")
+        .update({ enabled: false })
+        .eq("id", id)
+        .eq("user_id", userId);
       return false;
     }
     await ensureAndroidChannel();
-    const token = await Notifications.getExpoPushTokenAsync({ projectId: 'f5bfa130-617b-4542-b5be-1b45a6f46ac5' });
-    const { error } = await supabase.from('device_tokens').upsert({ id,user_id:userId,token:token.data,platform:Platform.OS,enabled:true,last_seen_at:new Date().toISOString() });
+    const token = await Notifications.getExpoPushTokenAsync({
+      projectId: "f5bfa130-617b-4542-b5be-1b45a6f46ac5",
+    });
+    const { error } = await supabase
+      .from("device_tokens")
+      .upsert({
+        id,
+        user_id: userId,
+        token: token.data,
+        platform: Platform.OS,
+        enabled: true,
+        last_seen_at: new Date().toISOString(),
+      });
     return !error;
-  } catch { return false; }
+  } catch {
+    return false;
+  }
 }
-export async function unregisterPushDevice(userId:string):Promise<void> {
- const { supabase } = await import('./supabase');
- const AsyncStorage=(await import('@react-native-async-storage/async-storage')).default;
- const id=await AsyncStorage.getItem(`aldim:device:${userId}`);
- if(supabase&&id){const {error}=await supabase.from('device_tokens').delete().eq('id',id).eq('user_id',userId);if(error)throw error;}
- await cancelAllScheduledNotifications();
+export async function unregisterPushDevice(userId: string): Promise<void> {
+  const { supabase } = await import("./supabase");
+  const AsyncStorage = (
+    await import("@react-native-async-storage/async-storage")
+  ).default;
+  const id = await AsyncStorage.getItem(`aldim:device:${userId}`);
+  if (supabase && id) {
+    const { error } = await supabase
+      .from("device_tokens")
+      .delete()
+      .eq("id", id)
+      .eq("user_id", userId);
+    if (error) throw error;
+  }
+  await cancelAllScheduledNotifications();
 }

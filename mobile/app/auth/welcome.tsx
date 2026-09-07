@@ -14,7 +14,11 @@ export default function WelcomeScreen() {
     <SafeAreaView style={styles.safe} edges={["top", "bottom"]}>
       <View style={styles.hero}>
         <View style={styles.iconWrap}>
-          <Ionicons name="lock-closed-outline" size={42} color={colors.brand[700]} />
+          <Ionicons
+            name="lock-closed-outline"
+            size={42}
+            color={colors.brand[700]}
+          />
         </View>
         <Text style={styles.title}>Hesabınla devam et</Text>
         <Text style={styles.desc}>
@@ -46,10 +50,13 @@ export default function WelcomeScreen() {
               color={colors.warn[600]}
             />
             <View style={{ flex: 1 }}>
-              <Text style={styles.noticeTitle}>Giriş sistemi yapılandırılmamış</Text>
+              <Text style={styles.noticeTitle}>
+                Giriş sistemi yapılandırılmamış
+              </Text>
               <Text style={styles.noticeText}>
-                Supabase anahtarlarını <Text style={styles.code}>.env.local</Text>{" "}
-                dosyasına eklemelisin:
+                Supabase anahtarlarını{" "}
+                <Text style={styles.code}>.env.local</Text> dosyasına
+                eklemelisin:
                 {"\n"}
                 <Text style={styles.code}>EXPO_PUBLIC_SUPABASE_URL</Text>
                 {"\n"}

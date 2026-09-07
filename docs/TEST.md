@@ -14,10 +14,10 @@ SMS/e-posta sağlayıcıları henüz bağlı olmadığından bu iki kanaldan ger
 
 ## Otomatik doğrulama
 
-- 13 test: tarih/para, garanti/servis hatırlatma üretimi, eski veri sahipliği, harcama/yenileme ve bozuk görsel güvenliği.
+- 15 test: tarih/para, garanti/servis hatırlatma üretimi, eski veri sahipliği, harcama/yenileme bozuk görsel güvenliği ve geçici oturum zamanlaması.
 - 11 canlı Supabase testi: iki hesapla oturum, kayıt/hatırlatma atomikliği, RLS, private dosya, eski sürüm çatışması, servis takibi, eşzamanlı ödemenin tekilleşmesi, silinen kaydın geri gelmemesi, tercihler ve iki aylık fatura.
 - Web ve mobil TypeScript, web lint ve Next.js üretim derlemesi başarılı.
-- iOS + Android Hermes üretim paketleri başarılı.
+- iOS + Android Hermes üretim paketleri başarılı. iPhone 17 / iOS 26.5 simülatöründe gerçek hesap girişi, webdeki kayıtların görünmesi, fotoğrafın açılması ve 25 KB PDF oluşturularak iOS paylaşım ekranına ulaşılması doğrulandı.
 - Tarayıcı: giriş, ürün oluşturma, 1.250,50 TL tutar, fotoğraf yükleme, geçerli tek sayfa PDF indirme, masaüstü/390px telefon görünümü. Yatay taşma yok.
 - Bildirim fonksiyonu: yetkisiz çağrı 401; yetkili dry-run 200. Gerçek alıcılara test mesajı gönderilmedi.
 - Supabase test hesapları ve belgeleri teslimden önce temizlenir.

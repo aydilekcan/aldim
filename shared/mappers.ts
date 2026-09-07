@@ -209,10 +209,12 @@ export interface DocumentRow {
   deleted_at: string | null;
 }
 
-export function documentToRow(d: AldimDocument): Omit<
-  DocumentRow,
-  "created_at"
-> & { created_at?: string; storage_path: string | null } {
+export function documentToRow(
+  d: AldimDocument,
+): Omit<DocumentRow, "created_at"> & {
+  created_at?: string;
+  storage_path: string | null;
+} {
   return {
     id: d.id,
     user_id: d.userId,
@@ -269,7 +271,12 @@ export function settingsToRow(
     user_id: userId,
     notifications_enabled: s.notificationsEnabled,
     daily_notify_hour: 10,
-    reminder_preferences: { onboardingComplete: s.onboardingComplete, emailEnabled: s.emailEnabled !== false, smsEnabled: s.smsEnabled === true, phone: s.phone ?? "" },
+    reminder_preferences: {
+      onboardingComplete: s.onboardingComplete,
+      emailEnabled: s.emailEnabled !== false,
+      smsEnabled: s.smsEnabled === true,
+      phone: s.phone ?? "",
+    },
   };
 }
 

@@ -1,6 +1,13 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Alert,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button } from "../../components/Button";
 import { Field, TextField } from "../../components/Field";
@@ -30,8 +37,14 @@ export default function SignInScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }} edges={["bottom"]}>
-      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: colors.white }}
+      edges={["bottom"]}
+    >
+      <ScrollView
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+      >
         <Text style={styles.title}>Giriş yap</Text>
         <Text style={styles.desc}>Aldım hesabınla devam et.</Text>
 
@@ -60,7 +73,12 @@ export default function SignInScreen() {
           </Pressable>
 
           <View style={{ marginTop: spacing.lg }}>
-            <Button title="Giriş yap" onPress={onSubmit} loading={saving} fullWidth />
+            <Button
+              title="Giriş yap"
+              onPress={onSubmit}
+              loading={saving}
+              fullWidth
+            />
           </View>
 
           <View style={styles.altRow}>
@@ -103,5 +121,9 @@ const styles = StyleSheet.create({
     marginTop: spacing.xl,
   },
   altText: { fontSize: fontSize.sm, color: colors.ink[600] },
-  altLink: { fontSize: fontSize.sm, color: colors.brand[700], fontWeight: "700" },
+  altLink: {
+    fontSize: fontSize.sm,
+    color: colors.brand[700],
+    fontWeight: "700",
+  },
 });

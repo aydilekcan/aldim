@@ -45,7 +45,9 @@ export interface ItemFormSubmit {
 
 export type ItemFormValues = Record<string, string | boolean>;
 
-export function defaultValuesForCategory(category: ItemCategory): ItemFormValues {
+export function defaultValuesForCategory(
+  category: ItemCategory,
+): ItemFormValues {
   const spec = CATEGORIES[category];
   const out: ItemFormValues = {};
   for (const f of spec.fields) {
@@ -142,8 +144,19 @@ export function ItemForm({
       let parsed: ItemFieldValue = s;
       if (f.type === "number" || f.type === "currency") {
         let num: number;
-        try { num = f.type === "currency" ? parseAmount(s) : Number(s); } catch { Alert.alert("Geçersiz tutar", `${f.label}: 1.250,50 gibi bir tutar gir.`); return; }
-        if (!Number.isFinite(num) || num < 0) { Alert.alert("Geçersiz sayı", f.label); return; }
+        try {
+          num = f.type === "currency" ? parseAmount(s) : Number(s);
+        } catch {
+          Alert.alert(
+            "Geçersiz tutar",
+            `${f.label}: 1.250,50 gibi bir tutar gir.`,
+          );
+          return;
+        }
+        if (!Number.isFinite(num) || num < 0) {
+          Alert.alert("Geçersiz sayı", f.label);
+          return;
+        }
         parsed = num;
       }
       if (f.topLevel) {
@@ -158,7 +171,11 @@ export function ItemForm({
       return;
     }
 
-    try { await onSubmit({ top, fields }, invoiceImageUri); } catch (error) { Alert.alert("Kaydedilemedi", (error as Error).message); }
+    try {
+      await onSubmit({ top, fields }, invoiceImageUri);
+    } catch (error) {
+      Alert.alert("Kaydedilemedi", (error as Error).message);
+    }
   };
 
   return (
@@ -182,7 +199,12 @@ export function ItemForm({
         <Card style={{ gap: spacing.xs }}>
           <CardTitle>Temel bilgiler</CardTitle>
           {essentialFields.map((f) => (
-            <FieldRenderer key={f.key} spec={f} value={v[f.key]} onChange={setVal} />
+            <FieldRenderer
+              key={f.key}
+              spec={f}
+              value={v[f.key]}
+              onChange={setVal}
+            />
           ))}
         </Card>
 
@@ -233,8 +255,14 @@ export function ItemForm({
                 <Image source={{ uri: invoiceImageUri }} style={styles.image} />
               ) : (
                 <View style={styles.imageEmpty}>
-                  <Ionicons name="image-outline" size={28} color={colors.brand[700]} />
-                  <Text style={styles.imageText}>Fatura / belge fotoğrafı ekle</Text>
+                  <Ionicons
+                    name="image-outline"
+                    size={28}
+                    color={colors.brand[700]}
+                  />
+                  <Text style={styles.imageText}>
+                    Fatura / belge fotoğrafı ekle
+                  </Text>
                   <Text style={styles.imageHint}>Galeriden seç</Text>
                 </View>
               )}
@@ -250,7 +278,12 @@ export function ItemForm({
         <View style={{ flexDirection: "row", gap: spacing.sm }}>
           <Button title="Vazgeç" variant="outline" onPress={onCancel} />
           <View style={{ flex: 1 }}>
-            <Button title={submitLabel} loading={saving} onPress={submit} fullWidth />
+            <Button
+              title={submitLabel}
+              loading={saving}
+              onPress={submit}
+              fullWidth
+            />
           </View>
         </View>
       </ScrollView>
@@ -319,7 +352,9 @@ function FieldRenderer({
                   },
                 ]}
               >
-                <Text style={[styles.chipText, active && { color: colors.white }]}>
+                <Text
+                  style={[styles.chipText, active && { color: colors.white }]}
+                >
                   {opt.label}
                 </Text>
               </Pressable>
@@ -340,13 +375,19 @@ function FieldRenderer({
         multiline={spec.type === "textarea"}
         numberOfLines={spec.type === "textarea" ? 3 : undefined}
         style={
-          spec.type === "textarea" ? { minHeight: 80, textAlignVertical: "top" } : undefined
+          spec.type === "textarea"
+            ? { minHeight: 80, textAlignVertical: "top" }
+            : undefined
         }
         keyboardType={
-          spec.type === "currency" || spec.type === "number" ? "decimal-pad" : "default"
+          spec.type === "currency" || spec.type === "number"
+            ? "decimal-pad"
+            : "default"
         }
         inputMode={
-          spec.type === "currency" || spec.type === "number" ? "decimal" : "text"
+          spec.type === "currency" || spec.type === "number"
+            ? "decimal"
+            : "text"
         }
         autoCapitalize={spec.key === "plate" ? "characters" : "sentences"}
       />

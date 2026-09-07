@@ -58,7 +58,9 @@ function toneFor(daysLeft: number): Tone {
 
 function notificationSummary(reminder: Reminder): string {
   if (reminder.status === "completed") return "Tamamlandı";
-  return reminder.notifyBeforeDays.map(d => d === 0 ? "Son gün" : `${d} gün önce`).join(" · ");
+  return reminder.notifyBeforeDays
+    .map((d) => (d === 0 ? "Son gün" : `${d} gün önce`))
+    .join(" · ");
 }
 
 export function ReminderRow({
@@ -81,7 +83,11 @@ export function ReminderRow({
   const inner = (
     <>
       <View style={[styles.iconWrap, { backgroundColor: palette.bg }]}>
-        <Ionicons name={TYPE_ICON[reminder.type]} size={20} color={palette.text} />
+        <Ionicons
+          name={TYPE_ICON[reminder.type]}
+          size={20}
+          color={palette.text}
+        />
       </View>
       <View style={{ flex: 1, minWidth: 0 }}>
         <View style={styles.titleRow}>
@@ -93,7 +99,8 @@ export function ReminderRow({
           </Badge>
         </View>
         <Text style={styles.meta}>
-          {formatDateTR(reminder.dueDate)} · {humanizeDaysLeft(reminder.dueDate)}
+          {formatDateTR(reminder.dueDate)} ·{" "}
+          {humanizeDaysLeft(reminder.dueDate)}
         </Text>
         <View style={styles.notifLine}>
           <Ionicons
@@ -104,13 +111,17 @@ export function ReminderRow({
             }
             size={12}
             color={
-              reminder.status !== "completed" ? colors.brand[700] : colors.ink[400]
+              reminder.status !== "completed"
+                ? colors.brand[700]
+                : colors.ink[400]
             }
           />
           <Text
             style={[
               styles.notifText,
-              reminder.notificationIds.length === 0 && { color: colors.ink[400] },
+              reminder.notificationIds.length === 0 && {
+                color: colors.ink[400],
+              },
             ]}
           >
             {notificationSummary(reminder)}

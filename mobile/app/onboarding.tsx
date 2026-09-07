@@ -93,7 +93,8 @@ export default function Onboarding() {
             useNativeDriver: false,
             listener: (e) => {
               const idx = Math.round(
-                (e.nativeEvent as { contentOffset: { x: number } }).contentOffset.x / width,
+                (e.nativeEvent as { contentOffset: { x: number } })
+                  .contentOffset.x / width,
               );
               setPage(idx);
             },
@@ -119,7 +120,10 @@ export default function Onboarding() {
             key={i}
             style={[
               styles.dot,
-              { backgroundColor: i === page ? colors.brand[700] : colors.ink[200] },
+              {
+                backgroundColor:
+                  i === page ? colors.brand[700] : colors.ink[200],
+              },
               i === page && { width: 22 },
             ]}
           />
@@ -138,7 +142,10 @@ export default function Onboarding() {
               onPress={() => onFinish(true)}
               fullWidth
             />
-            <Pressable onPress={() => onFinish(false)} style={{ marginTop: spacing.md }}>
+            <Pressable
+              onPress={() => onFinish(false)}
+              style={{ marginTop: spacing.md }}
+            >
               <Text style={styles.secondary}>Şimdilik bildirim açmayayım</Text>
             </Pressable>
           </>

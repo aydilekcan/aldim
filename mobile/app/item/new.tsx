@@ -22,7 +22,9 @@ export default function NewItemScreen() {
     params.category && params.category in CATEGORIES
       ? (params.category as ItemCategory)
       : null;
-  const [selected, setSelected] = useState<ItemCategory | null>(initialCategory);
+  const [selected, setSelected] = useState<ItemCategory | null>(
+    initialCategory,
+  );
   const { addItem, addDocumentToItem } = useAldimStore();
   const [saving, setSaving] = useState(false);
 
@@ -67,11 +69,21 @@ export default function NewItemScreen() {
         // Fire-and-await: kopyalama başarısız olursa kullanıcı yine de kaydı
         // gördüğü için sessizce devam ediyoruz; belge yoksa item detayında
         // "Henüz belge eklenmemiş" görünür.
-        try { await addDocumentToItem(created.id, {
-          type: selected === "home_bill" ? "bill" : "invoice",
-          date: submit.top.purchaseDate ?? new Date().toISOString().slice(0, 10),
-          fileUri: invoiceImageUri,
-        }); } catch (error) { Alert.alert("Kayıt eklendi; belge yüklenemedi", (error as Error).message); router.replace(`/item/${created.id}`); return; }
+        try {
+          await addDocumentToItem(created.id, {
+            type: selected === "home_bill" ? "bill" : "invoice",
+            date:
+              submit.top.purchaseDate ?? new Date().toISOString().slice(0, 10),
+            fileUri: invoiceImageUri,
+          });
+        } catch (error) {
+          Alert.alert(
+            "Kayıt eklendi; belge yüklenemedi",
+            (error as Error).message,
+          );
+          router.replace(`/item/${created.id}`);
+          return;
+        }
       }
 
       const perm = await getNotificationPermissionStatus();

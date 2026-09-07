@@ -1,13 +1,137 @@
-'use client';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Home, Layers, Bell, FolderOpen, Settings, Plus, RefreshCw, ShieldCheck, Wallet } from 'lucide-react';
-import { useAldimStore } from '@/lib/store';
-import { AuthForm } from './auth-form';
-const links = [{href:'/app',label:'Genel bakış',icon:Home},{href:'/app/items',label:'Kayıtlarım',icon:Layers},{href:'/app/reminders',label:'Hatırlatmalar',icon:Bell},{href:'/app/documents',label:'Belge kasası',icon:FolderOpen},{href:'/app/spending',label:'Harcamalar',icon:Wallet}];
-export function AppShell({children}: {children: React.ReactNode}) {
- const path=usePathname();const {user,loading,error,refresh}=useAldimStore();
- if(loading&&!user) return <div className="loading-screen">Aldım açılıyor…</div>;
- if(!user) return <AuthForm/>;
- return <div className="app-layout"><a className="skip-link" href="#main">İçeriğe geç</a><aside className="sidebar"><Link className="wordmark" href="/app">aldım<span>•</span></Link><div className="sidebar-caption">HER ŞEY KONTROL ALTINDA</div><nav aria-label="Ana menü">{links.map(({href,label,icon:Icon})=><Link key={href} className={path===href?'nav-link active':'nav-link'} href={href}><Icon size={20}/>{label}{path===href&&<span className="nav-dot"/>}</Link>)}</nav><Link className="primary sidebar-add" href="/app/items/new"><Plus size={19}/> Yeni kayıt</Link><div className="sidebar-bottom"><div className="private-card"><ShieldCheck size={23}/><strong>Sana özel bir alan.</strong><p>Belgelerin güvenle saklanır,<br/>ihtiyacın olduğunda yanındadır.</p></div><Link className="nav-link" href="/app/settings"><Settings size={19}/> Ayarlar</Link></div></aside><div className="main-wrap"><header className="topbar"><span className="topbar-brand">Küçük bir düzen, büyük bir rahatlık.</span><div className="topbar-actions"><button className="icon-button" title="Verileri yenile" aria-label="Verileri yenile" onClick={()=>void refresh()}><RefreshCw size={18}/></button><Link className="icon-button" aria-label="Hatırlatmalar" href="/app/reminders"><Bell size={19}/></Link><Link href="/app/settings" className="avatar" aria-label="Hesap ayarları">{user.email?.[0]?.toLocaleUpperCase('tr')}</Link></div></header><main id="main">{error&&<div className="error" role="alert">Veriler güncellenemedi: {error} <button onClick={()=>void refresh()}>Tekrar dene</button></div>}{loading?<div className="loading-screen">Kayıtların yükleniyor…</div>:children}</main><footer className="app-footer">Aldım ile her şey elinin altında.<span>Faturan · Garantin · Hatırlatman</span></footer></div><nav className="mobile-nav" aria-label="Mobil menü">{links.slice(0,4).map(({href,label,icon:Icon})=><Link key={href} className={path===href?'active':''} href={href}><Icon size={21}/><span>{label}</span></Link>)}<Link href="/app/settings" aria-label="Ayarlar"><Settings size={21}/><span>Ayarlar</span></Link></nav></div>;
+"use client";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import {
+  Home,
+  Layers,
+  Bell,
+  FolderOpen,
+  Settings,
+  Plus,
+  RefreshCw,
+  ShieldCheck,
+  Wallet,
+} from "lucide-react";
+import { useAldimStore } from "@/lib/store";
+import { AuthForm } from "./auth-form";
+const links = [
+  { href: "/app", label: "Genel bakış", icon: Home },
+  { href: "/app/items", label: "Kayıtlarım", icon: Layers },
+  { href: "/app/reminders", label: "Hatırlatmalar", icon: Bell },
+  { href: "/app/documents", label: "Belge kasası", icon: FolderOpen },
+  { href: "/app/spending", label: "Harcamalar", icon: Wallet },
+];
+export function AppShell({ children }: { children: React.ReactNode }) {
+  const path = usePathname();
+  const { user, loading, error, refresh } = useAldimStore();
+  if (loading && !user)
+    return <div className="loading-screen">Aldım açılıyor…</div>;
+  if (!user) return <AuthForm />;
+  return (
+    <div className="app-layout">
+      <a className="skip-link" href="#main">
+        İçeriğe geç
+      </a>
+      <aside className="sidebar">
+        <Link className="wordmark" href="/app">
+          aldım<span>•</span>
+        </Link>
+        <div className="sidebar-caption">HER ŞEY KONTROL ALTINDA</div>
+        <nav aria-label="Ana menü">
+          {links.map(({ href, label, icon: Icon }) => (
+            <Link
+              key={href}
+              className={path === href ? "nav-link active" : "nav-link"}
+              href={href}
+            >
+              <Icon size={20} />
+              {label}
+              {path === href && <span className="nav-dot" />}
+            </Link>
+          ))}
+        </nav>
+        <Link className="primary sidebar-add" href="/app/items/new">
+          <Plus size={19} /> Yeni kayıt
+        </Link>
+        <div className="sidebar-bottom">
+          <div className="private-card">
+            <ShieldCheck size={23} />
+            <strong>Sana özel bir alan.</strong>
+            <p>
+              Belgelerin güvenle saklanır,
+              <br />
+              ihtiyacın olduğunda yanındadır.
+            </p>
+          </div>
+          <Link className="nav-link" href="/app/settings">
+            <Settings size={19} /> Ayarlar
+          </Link>
+        </div>
+      </aside>
+      <div className="main-wrap">
+        <header className="topbar">
+          <span className="topbar-brand">
+            Küçük bir düzen, büyük bir rahatlık.
+          </span>
+          <div className="topbar-actions">
+            <button
+              className="icon-button"
+              title="Verileri yenile"
+              aria-label="Verileri yenile"
+              onClick={() => void refresh()}
+            >
+              <RefreshCw size={18} />
+            </button>
+            <Link
+              className="icon-button"
+              aria-label="Hatırlatmalar"
+              href="/app/reminders"
+            >
+              <Bell size={19} />
+            </Link>
+            <Link
+              href="/app/settings"
+              className="avatar"
+              aria-label="Hesap ayarları"
+            >
+              {user.email?.[0]?.toLocaleUpperCase("tr")}
+            </Link>
+          </div>
+        </header>
+        <main id="main">
+          {error && (
+            <div className="error" role="alert">
+              Veriler güncellenemedi: {error}{" "}
+              <button onClick={() => void refresh()}>Tekrar dene</button>
+            </div>
+          )}
+          {loading ? (
+            <div className="loading-screen">Kayıtların yükleniyor…</div>
+          ) : (
+            children
+          )}
+        </main>
+        <footer className="app-footer">
+          Aldım ile her şey elinin altında.
+          <span>Faturan · Garantin · Hatırlatman</span>
+        </footer>
+      </div>
+      <nav className="mobile-nav" aria-label="Mobil menü">
+        {links.slice(0, 4).map(({ href, label, icon: Icon }) => (
+          <Link
+            key={href}
+            className={path === href ? "active" : ""}
+            href={href}
+          >
+            <Icon size={21} />
+            <span>{label}</span>
+          </Link>
+        ))}
+        <Link href="/app/settings" aria-label="Ayarlar">
+          <Settings size={21} />
+          <span>Ayarlar</span>
+        </Link>
+      </nav>
+    </div>
+  );
 }

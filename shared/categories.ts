@@ -52,7 +52,18 @@ export interface CategorySpec {
   description: string;
   /** Kart altındaki örnek satırı — "Telefon, laptop, kulaklık" vb. */
   examples: string;
-  icon: "bed-outline" | "build-outline" | "cafe-outline" | "car-sport-outline" | "cube-outline" | "ellipsis-horizontal-outline" | "flash-outline" | "phone-portrait-outline" | "play-circle-outline" | "shield-half-outline" | "shirt-outline";
+  icon:
+    | "bed-outline"
+    | "build-outline"
+    | "cafe-outline"
+    | "car-sport-outline"
+    | "cube-outline"
+    | "ellipsis-horizontal-outline"
+    | "flash-outline"
+    | "phone-portrait-outline"
+    | "play-circle-outline"
+    | "shield-half-outline"
+    | "shirt-outline";
   titleLabel: string;
   submitLabel: string;
   /** Hatırlatma kurulduktan sonra gösterilen başarı metni (izin verildiyse) */
@@ -125,7 +136,14 @@ export const CATEGORIES: Record<ItemCategory, CategorySpec> = {
     successMessage: "Ürün kaydedildi. Garanti ve iade hatırlatmaları kuruldu.",
     defaultDocumentTypes: ["invoice", "warranty", "other"],
     fields: [
-      { key: "title", label: "Ürün adı", type: "text", required: true, topLevel: true, essential: true },
+      {
+        key: "title",
+        label: "Ürün adı",
+        type: "text",
+        required: true,
+        topLevel: true,
+        essential: true,
+      },
       f.brand(),
       f.store(),
       f.purchaseDate(),
@@ -146,9 +164,27 @@ export const CATEGORIES: Record<ItemCategory, CategorySpec> = {
       },
       // Detaylı
       f.model(),
-      { key: "serialNumber", label: "Seri no", type: "text", hint: "Opsiyonel", essential: false },
-      { key: "invoiceNumber", label: "Fatura no", type: "text", hint: "Opsiyonel", essential: false },
-      { key: "serviceFollowUpDate", label: "Servis takip tarihi", type: "date", hint: "Opsiyonel", essential: false },
+      {
+        key: "serialNumber",
+        label: "Seri no",
+        type: "text",
+        hint: "Opsiyonel",
+        essential: false,
+      },
+      {
+        key: "invoiceNumber",
+        label: "Fatura no",
+        type: "text",
+        hint: "Opsiyonel",
+        essential: false,
+      },
+      {
+        key: "serviceFollowUpDate",
+        label: "Servis takip tarihi",
+        type: "date",
+        hint: "Opsiyonel",
+        essential: false,
+      },
       f.notes(),
     ],
     reminders: [
@@ -163,14 +199,16 @@ export const CATEGORIES: Record<ItemCategory, CategorySpec> = {
         type: "warranty_end",
         fieldKey: "warrantyEndDate",
         titleTemplate: "Garanti süresi yaklaşıyor",
-        bodyTemplate: "{{title}} için garanti bitişine {{daysBefore}} gün kaldı.",
+        bodyTemplate:
+          "{{title}} için garanti bitişine {{daysBefore}} gün kaldı.",
         notifyBeforeDays: [...DEFAULT_NOTIFY_DAYS.warranty],
       },
       {
         type: "service_follow_up",
         fieldKey: "serviceFollowUpDate",
         titleTemplate: "Servis takibi yaklaşıyor",
-        bodyTemplate: "{{title}} için servis takibine {{daysBefore}} gün kaldı.",
+        bodyTemplate:
+          "{{title}} için servis takibine {{daysBefore}} gün kaldı.",
         notifyBeforeDays: [...DEFAULT_NOTIFY_DAYS.serviceFollowUp],
       },
     ],
@@ -187,7 +225,14 @@ export const CATEGORIES: Record<ItemCategory, CategorySpec> = {
     successMessage: "Ürün kaydedildi. Garanti ve bakım hatırlatmaları kuruldu.",
     defaultDocumentTypes: ["invoice", "warranty", "service_form", "other"],
     fields: [
-      { key: "title", label: "Ürün adı", type: "text", required: true, topLevel: true, essential: true },
+      {
+        key: "title",
+        label: "Ürün adı",
+        type: "text",
+        required: true,
+        topLevel: true,
+        essential: true,
+      },
       f.brand(),
       f.model(true),
       f.purchaseDate(),
@@ -198,12 +243,30 @@ export const CATEGORIES: Record<ItemCategory, CategorySpec> = {
         essential: true,
         hint: "Bilmiyorsan boş bırakabilirsin.",
       },
-      { key: "installationDate", label: "Kurulum tarihi", type: "date", essential: true, hint: "Opsiyonel" },
+      {
+        key: "installationDate",
+        label: "Kurulum tarihi",
+        type: "date",
+        essential: true,
+        hint: "Opsiyonel",
+      },
       // Detaylı
       f.store("Satın alınan yer", false),
       f.price("Fiyat (₺)", false),
-      { key: "serialNumber", label: "Seri no", type: "text", hint: "Opsiyonel", essential: false },
-      { key: "invoiceNumber", label: "Fatura no", type: "text", hint: "Opsiyonel", essential: false },
+      {
+        key: "serialNumber",
+        label: "Seri no",
+        type: "text",
+        hint: "Opsiyonel",
+        essential: false,
+      },
+      {
+        key: "invoiceNumber",
+        label: "Fatura no",
+        type: "text",
+        hint: "Opsiyonel",
+        essential: false,
+      },
       {
         key: "extendedWarrantyEndDate",
         label: "Ek garanti bitiş tarihi",
@@ -211,9 +274,27 @@ export const CATEGORIES: Record<ItemCategory, CategorySpec> = {
         hint: "Opsiyonel",
         essential: false,
       },
-      { key: "serviceCompany", label: "Yetkili servis adı", type: "text", hint: "Opsiyonel", essential: false },
-      { key: "lastMaintenanceDate", label: "Son bakım tarihi", type: "date", hint: "Opsiyonel", essential: false },
-      { key: "nextMaintenanceDate", label: "Sonraki bakım tarihi", type: "date", hint: "Opsiyonel", essential: false },
+      {
+        key: "serviceCompany",
+        label: "Yetkili servis adı",
+        type: "text",
+        hint: "Opsiyonel",
+        essential: false,
+      },
+      {
+        key: "lastMaintenanceDate",
+        label: "Son bakım tarihi",
+        type: "date",
+        hint: "Opsiyonel",
+        essential: false,
+      },
+      {
+        key: "nextMaintenanceDate",
+        label: "Sonraki bakım tarihi",
+        type: "date",
+        hint: "Opsiyonel",
+        essential: false,
+      },
       f.notes(),
     ],
     reminders: [
@@ -221,14 +302,16 @@ export const CATEGORIES: Record<ItemCategory, CategorySpec> = {
         type: "warranty_end",
         fieldKey: "warrantyEndDate",
         titleTemplate: "Garanti süresi yaklaşıyor",
-        bodyTemplate: "{{title}} için garanti bitişine {{daysBefore}} gün kaldı.",
+        bodyTemplate:
+          "{{title}} için garanti bitişine {{daysBefore}} gün kaldı.",
         notifyBeforeDays: [...DEFAULT_NOTIFY_DAYS.warranty],
       },
       {
         type: "extended_warranty_end",
         fieldKey: "extendedWarrantyEndDate",
         titleTemplate: "Ek garanti süresi yaklaşıyor",
-        bodyTemplate: "{{title}} için ek garanti bitişine {{daysBefore}} gün kaldı.",
+        bodyTemplate:
+          "{{title}} için ek garanti bitişine {{daysBefore}} gün kaldı.",
         notifyBeforeDays: [...DEFAULT_NOTIFY_DAYS.extendedWarranty],
       },
       {
@@ -252,7 +335,14 @@ export const CATEGORIES: Record<ItemCategory, CategorySpec> = {
     successMessage: "Ürün kaydedildi. Garanti ve iade hatırlatmaları kuruldu.",
     defaultDocumentTypes: ["invoice", "warranty", "other"],
     fields: [
-      { key: "title", label: "Ürün adı", type: "text", required: true, topLevel: true, essential: true },
+      {
+        key: "title",
+        label: "Ürün adı",
+        type: "text",
+        required: true,
+        topLevel: true,
+        essential: true,
+      },
       f.brand(),
       f.store(),
       f.purchaseDate(),
@@ -273,8 +363,20 @@ export const CATEGORIES: Record<ItemCategory, CategorySpec> = {
       },
       // Detaylı
       f.model(),
-      { key: "invoiceNumber", label: "Fatura no", type: "text", hint: "Opsiyonel", essential: false },
-      { key: "serviceFollowUpDate", label: "Servis takip tarihi", type: "date", hint: "Opsiyonel", essential: false },
+      {
+        key: "invoiceNumber",
+        label: "Fatura no",
+        type: "text",
+        hint: "Opsiyonel",
+        essential: false,
+      },
+      {
+        key: "serviceFollowUpDate",
+        label: "Servis takip tarihi",
+        type: "date",
+        hint: "Opsiyonel",
+        essential: false,
+      },
       f.notes(),
     ],
     reminders: [
@@ -289,14 +391,16 @@ export const CATEGORIES: Record<ItemCategory, CategorySpec> = {
         type: "warranty_end",
         fieldKey: "warrantyEndDate",
         titleTemplate: "Garanti süresi yaklaşıyor",
-        bodyTemplate: "{{title}} için garanti bitişine {{daysBefore}} gün kaldı.",
+        bodyTemplate:
+          "{{title}} için garanti bitişine {{daysBefore}} gün kaldı.",
         notifyBeforeDays: [...DEFAULT_NOTIFY_DAYS.warranty],
       },
       {
         type: "service_follow_up",
         fieldKey: "serviceFollowUpDate",
         titleTemplate: "Servis takibi yaklaşıyor",
-        bodyTemplate: "{{title}} için servis takibine {{daysBefore}} gün kaldı.",
+        bodyTemplate:
+          "{{title}} için servis takibine {{daysBefore}} gün kaldı.",
         notifyBeforeDays: [...DEFAULT_NOTIFY_DAYS.serviceFollowUp],
       },
     ],
@@ -310,18 +414,43 @@ export const CATEGORIES: Record<ItemCategory, CategorySpec> = {
     icon: "bed-outline",
     titleLabel: "Ürün adı",
     submitLabel: "Ürünü kaydet",
-    successMessage: "Ürün kaydedildi. Teslimat ve garanti hatırlatmaları kuruldu.",
+    successMessage:
+      "Ürün kaydedildi. Teslimat ve garanti hatırlatmaları kuruldu.",
     defaultDocumentTypes: ["invoice", "warranty", "other"],
     fields: [
-      { key: "title", label: "Ürün adı", type: "text", required: true, topLevel: true, essential: true },
+      {
+        key: "title",
+        label: "Ürün adı",
+        type: "text",
+        required: true,
+        topLevel: true,
+        essential: true,
+      },
       f.brand("Marka / mağaza"),
       f.purchaseDate(),
-      { key: "deliveryDate", label: "Teslimat tarihi", type: "date", essential: true },
+      {
+        key: "deliveryDate",
+        label: "Teslimat tarihi",
+        type: "date",
+        essential: true,
+      },
       f.price(),
       // Detaylı
       f.store("Satın alınan yer", false),
-      { key: "installationDate", label: "Montaj tarihi", type: "date", hint: "Opsiyonel", essential: false },
-      { key: "invoiceNumber", label: "Fatura no", type: "text", hint: "Opsiyonel", essential: false },
+      {
+        key: "installationDate",
+        label: "Montaj tarihi",
+        type: "date",
+        hint: "Opsiyonel",
+        essential: false,
+      },
+      {
+        key: "invoiceNumber",
+        label: "Fatura no",
+        type: "text",
+        hint: "Opsiyonel",
+        essential: false,
+      },
       {
         key: "warrantyEndDate",
         label: "Garanti bitiş tarihi",
@@ -371,7 +500,8 @@ export const CATEGORIES: Record<ItemCategory, CategorySpec> = {
         type: "warranty_end",
         fieldKey: "warrantyEndDate",
         titleTemplate: "Garanti süresi yaklaşıyor",
-        bodyTemplate: "{{title}} için garanti bitişine {{daysBefore}} gün kaldı.",
+        bodyTemplate:
+          "{{title}} için garanti bitişine {{daysBefore}} gün kaldı.",
         notifyBeforeDays: [...DEFAULT_NOTIFY_DAYS.warranty],
       },
     ],
@@ -388,7 +518,14 @@ export const CATEGORIES: Record<ItemCategory, CategorySpec> = {
     successMessage: "Ürün kaydedildi. İade hatırlatması kuruldu.",
     defaultDocumentTypes: ["invoice", "return_request", "other"],
     fields: [
-      { key: "title", label: "Ürün adı", type: "text", required: true, topLevel: true, essential: true },
+      {
+        key: "title",
+        label: "Ürün adı",
+        type: "text",
+        required: true,
+        topLevel: true,
+        essential: true,
+      },
       f.brand(),
       f.purchaseDate(),
       f.price(),
@@ -401,9 +538,27 @@ export const CATEGORIES: Record<ItemCategory, CategorySpec> = {
       },
       // Detaylı
       f.store("Satın alınan yer", false),
-      { key: "size", label: "Beden / numara", type: "text", hint: "Opsiyonel", essential: false },
-      { key: "color", label: "Renk", type: "text", hint: "Opsiyonel", essential: false },
-      { key: "invoiceNumber", label: "Fatura no", type: "text", hint: "Opsiyonel", essential: false },
+      {
+        key: "size",
+        label: "Beden / numara",
+        type: "text",
+        hint: "Opsiyonel",
+        essential: false,
+      },
+      {
+        key: "color",
+        label: "Renk",
+        type: "text",
+        hint: "Opsiyonel",
+        essential: false,
+      },
+      {
+        key: "invoiceNumber",
+        label: "Fatura no",
+        type: "text",
+        hint: "Opsiyonel",
+        essential: false,
+      },
       f.notes(),
     ],
     reminders: [
@@ -438,10 +593,22 @@ export const CATEGORIES: Record<ItemCategory, CategorySpec> = {
         essential: true,
         placeholder: "Örn. Eşin arabası",
       },
-      { key: "plate", label: "Plaka", type: "text", required: true, essential: true, placeholder: "34 ABC 123" },
+      {
+        key: "plate",
+        label: "Plaka",
+        type: "text",
+        required: true,
+        essential: true,
+        placeholder: "34 ABC 123",
+      },
       f.brand(),
       f.model(true),
-      { key: "nextInspectionDate", label: "Sıradaki muayene tarihi", type: "date", essential: true },
+      {
+        key: "nextInspectionDate",
+        label: "Sıradaki muayene tarihi",
+        type: "date",
+        essential: true,
+      },
       {
         key: "mtvPaymentDate",
         label: "MTV ödeme tarihi",
@@ -449,11 +616,27 @@ export const CATEGORIES: Record<ItemCategory, CategorySpec> = {
         essential: true,
         hint: "Resmi sorgulama yapmaz; girdiğin tarihe göre hatırlatır.",
       },
-      { key: "trafficInsuranceEndDate", label: "Trafik sigortası bitiş", type: "date", essential: true },
+      {
+        key: "trafficInsuranceEndDate",
+        label: "Trafik sigortası bitiş",
+        type: "date",
+        essential: true,
+      },
       // Detaylı
-      { key: "modelYear", label: "Model yılı", type: "number", essential: false },
+      {
+        key: "modelYear",
+        label: "Model yılı",
+        type: "number",
+        essential: false,
+      },
       f.purchaseDate("Satın alma tarihi", false),
-      { key: "kaskoEndDate", label: "Kasko bitiş tarihi", type: "date", hint: "Opsiyonel", essential: false },
+      {
+        key: "kaskoEndDate",
+        label: "Kasko bitiş tarihi",
+        type: "date",
+        hint: "Opsiyonel",
+        essential: false,
+      },
       {
         key: "exhaustInspectionDate",
         label: "Egzoz muayene tarihi",
@@ -475,7 +658,13 @@ export const CATEGORIES: Record<ItemCategory, CategorySpec> = {
         hint: "Opsiyonel",
         essential: false,
       },
-      { key: "lastMaintenanceDate", label: "Son bakım tarihi", type: "date", hint: "Opsiyonel", essential: false },
+      {
+        key: "lastMaintenanceDate",
+        label: "Son bakım tarihi",
+        type: "date",
+        hint: "Opsiyonel",
+        essential: false,
+      },
       {
         key: "lastMaintenanceKm",
         label: "Son bakım kilometresi",
@@ -497,7 +686,13 @@ export const CATEGORIES: Record<ItemCategory, CategorySpec> = {
         hint: "Opsiyonel",
         essential: false,
       },
-      { key: "tireChangeDate", label: "Lastik değişim tarihi", type: "date", hint: "Opsiyonel", essential: false },
+      {
+        key: "tireChangeDate",
+        label: "Lastik değişim tarihi",
+        type: "date",
+        hint: "Opsiyonel",
+        essential: false,
+      },
       f.notes(),
     ],
     reminders: [
@@ -505,7 +700,8 @@ export const CATEGORIES: Record<ItemCategory, CategorySpec> = {
         type: "vehicle_inspection",
         fieldKey: "nextInspectionDate",
         titleTemplate: "Muayene tarihi yaklaşıyor",
-        bodyTemplate: "{{title}} için sıradaki muayeneye {{daysBefore}} gün kaldı.",
+        bodyTemplate:
+          "{{title}} için sıradaki muayeneye {{daysBefore}} gün kaldı.",
         notifyBeforeDays: [...DEFAULT_NOTIFY_DAYS.vehicleInspection],
       },
       {
@@ -519,14 +715,16 @@ export const CATEGORIES: Record<ItemCategory, CategorySpec> = {
         type: "traffic_insurance",
         fieldKey: "trafficInsuranceEndDate",
         titleTemplate: "Trafik sigortası yenileme zamanı",
-        bodyTemplate: "{{title}} trafik sigortasının bitmesine {{daysBefore}} gün kaldı.",
+        bodyTemplate:
+          "{{title}} trafik sigortasının bitmesine {{daysBefore}} gün kaldı.",
         notifyBeforeDays: [...DEFAULT_NOTIFY_DAYS.insurance],
       },
       {
         type: "kasko",
         fieldKey: "kaskoEndDate",
         titleTemplate: "Kasko yenileme zamanı",
-        bodyTemplate: "{{title}} kaskosunun bitmesine {{daysBefore}} gün kaldı.",
+        bodyTemplate:
+          "{{title}} kaskosunun bitmesine {{daysBefore}} gün kaldı.",
         notifyBeforeDays: [...DEFAULT_NOTIFY_DAYS.insurance],
       },
       {
@@ -540,7 +738,8 @@ export const CATEGORIES: Record<ItemCategory, CategorySpec> = {
         type: "traffic_fine",
         fieldKey: "trafficFineDueDate",
         titleTemplate: "Trafik cezası son ödeme yaklaşıyor",
-        bodyTemplate: "{{title}} için trafik cezası ödemesine {{daysBefore}} gün kaldı.",
+        bodyTemplate:
+          "{{title}} için trafik cezası ödemesine {{daysBefore}} gün kaldı.",
         notifyBeforeDays: [...DEFAULT_NOTIFY_DAYS.trafficFine],
       },
       {
@@ -554,7 +753,8 @@ export const CATEGORIES: Record<ItemCategory, CategorySpec> = {
         type: "generic_deadline",
         fieldKey: "tireChangeDate",
         titleTemplate: "Lastik değişim tarihi yaklaşıyor",
-        bodyTemplate: "{{title}} için lastik değişimine {{daysBefore}} gün kaldı.",
+        bodyTemplate:
+          "{{title}} için lastik değişimine {{daysBefore}} gün kaldı.",
         notifyBeforeDays: [...DEFAULT_NOTIFY_DAYS.tireChange],
       },
     ],
@@ -571,7 +771,12 @@ export const CATEGORIES: Record<ItemCategory, CategorySpec> = {
     successMessage: "Fatura kaydedildi. Son ödeme hatırlatması kuruldu.",
     defaultDocumentTypes: ["bill", "invoice", "other"],
     fields: [
-      { key: "recurring", label: "Tekrarlansın mı?", type: "boolean", essential: true },
+      {
+        key: "recurring",
+        label: "Tekrarlansın mı?",
+        type: "boolean",
+        essential: true,
+      },
       {
         key: "title",
         label: "Fatura adı",
@@ -596,7 +801,12 @@ export const CATEGORIES: Record<ItemCategory, CategorySpec> = {
         ],
       },
       f.brand("Kurum / sağlayıcı"),
-      { key: "subscriberNumber", label: "Abone no", type: "text", essential: true },
+      {
+        key: "subscriberNumber",
+        label: "Abone no",
+        type: "text",
+        essential: true,
+      },
       {
         key: "dueDate",
         label: "Son ödeme tarihi",
@@ -605,12 +815,40 @@ export const CATEGORIES: Record<ItemCategory, CategorySpec> = {
         essential: true,
         hint: "Bu tarihten önce bildirim alırsın.",
       },
-      { key: "amount", label: "Fatura tutarı (₺)", type: "currency", essential: true },
-      { key: "autoPayment", label: "Otomatik ödeme var mı?", type: "boolean", essential: true },
+      {
+        key: "amount",
+        label: "Fatura tutarı (₺)",
+        type: "currency",
+        essential: true,
+      },
+      {
+        key: "autoPayment",
+        label: "Otomatik ödeme var mı?",
+        type: "boolean",
+        essential: true,
+      },
       // Detaylı
-      { key: "contractAccountNumber", label: "Sözleşme hesap no", type: "text", hint: "Opsiyonel", essential: false },
-      { key: "installationNumber", label: "Tesisat no", type: "text", hint: "Opsiyonel", essential: false },
-      { key: "period", label: "Dönem", type: "text", hint: "Opsiyonel — örn. 2026/05", essential: false },
+      {
+        key: "contractAccountNumber",
+        label: "Sözleşme hesap no",
+        type: "text",
+        hint: "Opsiyonel",
+        essential: false,
+      },
+      {
+        key: "installationNumber",
+        label: "Tesisat no",
+        type: "text",
+        hint: "Opsiyonel",
+        essential: false,
+      },
+      {
+        key: "period",
+        label: "Dönem",
+        type: "text",
+        hint: "Opsiyonel — örn. 2026/05",
+        essential: false,
+      },
       {
         key: "recurrencePeriod",
         label: "Tekrar periyodu",
@@ -620,7 +858,7 @@ export const CATEGORIES: Record<ItemCategory, CategorySpec> = {
           { value: "bimonthly", label: "2 ayda bir" },
           { value: "quarterly", label: "3 ayda bir" },
         ],
-        hint: "Yalnızca \"Tekrarlansın\" seçilirse uygulanır",
+        hint: 'Yalnızca "Tekrarlansın" seçilirse uygulanır',
         essential: false,
       },
       f.notes(),
@@ -630,7 +868,8 @@ export const CATEGORIES: Record<ItemCategory, CategorySpec> = {
         type: "bill_due",
         fieldKey: "dueDate",
         titleTemplate: "Fatura son ödeme tarihi yaklaşıyor",
-        bodyTemplate: "{{title}} için son ödeme tarihine {{daysBefore}} gün kaldı.",
+        bodyTemplate:
+          "{{title}} için son ödeme tarihine {{daysBefore}} gün kaldı.",
         notifyBeforeDays: [...DEFAULT_NOTIFY_DAYS.billDue],
       },
     ],
@@ -647,7 +886,14 @@ export const CATEGORIES: Record<ItemCategory, CategorySpec> = {
     successMessage: "Poliçe kaydedildi. Bitiş hatırlatması kuruldu.",
     defaultDocumentTypes: ["policy", "other"],
     fields: [
-      { key: "title", label: "Poliçe adı", type: "text", required: true, topLevel: true, essential: true },
+      {
+        key: "title",
+        label: "Poliçe adı",
+        type: "text",
+        required: true,
+        topLevel: true,
+        essential: true,
+      },
       {
         key: "insuranceType",
         label: "Sigorta türü",
@@ -663,12 +909,41 @@ export const CATEGORIES: Record<ItemCategory, CategorySpec> = {
         ],
       },
       f.brand("Sigorta şirketi"),
-      { key: "policyNumber", label: "Poliçe no", type: "text", essential: true },
-      { key: "endDate", label: "Bitiş tarihi", type: "date", required: true, essential: true },
+      {
+        key: "policyNumber",
+        label: "Poliçe no",
+        type: "text",
+        essential: true,
+      },
+      {
+        key: "endDate",
+        label: "Bitiş tarihi",
+        type: "date",
+        required: true,
+        essential: true,
+      },
       // Detaylı
-      { key: "startDate", label: "Başlangıç tarihi", type: "date", hint: "Opsiyonel", essential: false },
-      { key: "premium", label: "Prim tutarı (₺)", type: "currency", hint: "Opsiyonel", essential: false },
-      { key: "renewalDate", label: "Yenileme tarihi", type: "date", hint: "Opsiyonel", essential: false },
+      {
+        key: "startDate",
+        label: "Başlangıç tarihi",
+        type: "date",
+        hint: "Opsiyonel",
+        essential: false,
+      },
+      {
+        key: "premium",
+        label: "Prim tutarı (₺)",
+        type: "currency",
+        hint: "Opsiyonel",
+        essential: false,
+      },
+      {
+        key: "renewalDate",
+        label: "Yenileme tarihi",
+        type: "date",
+        hint: "Opsiyonel",
+        essential: false,
+      },
       f.notes(),
     ],
     reminders: [
@@ -676,14 +951,16 @@ export const CATEGORIES: Record<ItemCategory, CategorySpec> = {
         type: "policy_end",
         fieldKey: "endDate",
         titleTemplate: "Poliçe bitiş tarihi yaklaşıyor",
-        bodyTemplate: "{{title}} için poliçe bitişine {{daysBefore}} gün kaldı.",
+        bodyTemplate:
+          "{{title}} için poliçe bitişine {{daysBefore}} gün kaldı.",
         notifyBeforeDays: [...DEFAULT_NOTIFY_DAYS.policyEnd],
       },
       {
         type: "policy_end",
         fieldKey: "renewalDate",
         titleTemplate: "Poliçe yenileme tarihi yaklaşıyor",
-        bodyTemplate: "{{title}} için poliçe yenilemesine {{daysBefore}} gün kaldı.",
+        bodyTemplate:
+          "{{title}} için poliçe yenilemesine {{daysBefore}} gün kaldı.",
         notifyBeforeDays: [...DEFAULT_NOTIFY_DAYS.policyRenewal],
       },
     ],
@@ -710,13 +987,51 @@ export const CATEGORIES: Record<ItemCategory, CategorySpec> = {
         placeholder: "Örn. Netflix",
       },
       f.brand("Sağlayıcı"),
-      { key: "renewalDate", label: "Yenileme / ödeme tarihi", type: "date", required: true, essential: true },
-      { key: "monthlyAmount", label: "Dönem tutarı (₺)", type: "currency", essential: true },
-      { key: "billingCycle", label: "Ödeme sıklığı", type: "select", essential: true, options: [{ value: "monthly", label: "Her ay" }, { value: "yearly", label: "Her yıl" }, { value: "quarterly", label: "3 ayda bir" }] },
-      { key: "autoRenewal", label: "Otomatik yenileme var mı?", type: "boolean", essential: true },
+      {
+        key: "renewalDate",
+        label: "Yenileme / ödeme tarihi",
+        type: "date",
+        required: true,
+        essential: true,
+      },
+      {
+        key: "monthlyAmount",
+        label: "Dönem tutarı (₺)",
+        type: "currency",
+        essential: true,
+      },
+      {
+        key: "billingCycle",
+        label: "Ödeme sıklığı",
+        type: "select",
+        essential: true,
+        options: [
+          { value: "monthly", label: "Her ay" },
+          { value: "yearly", label: "Her yıl" },
+          { value: "quarterly", label: "3 ayda bir" },
+        ],
+      },
+      {
+        key: "autoRenewal",
+        label: "Otomatik yenileme var mı?",
+        type: "boolean",
+        essential: true,
+      },
       // Detaylı
-      { key: "packageName", label: "Paket adı", type: "text", hint: "Opsiyonel", essential: false },
-      { key: "startDate", label: "Başlangıç tarihi", type: "date", hint: "Opsiyonel", essential: false },
+      {
+        key: "packageName",
+        label: "Paket adı",
+        type: "text",
+        hint: "Opsiyonel",
+        essential: false,
+      },
+      {
+        key: "startDate",
+        label: "Başlangıç tarihi",
+        type: "date",
+        hint: "Opsiyonel",
+        essential: false,
+      },
       {
         key: "commitmentEndDate",
         label: "Taahhüt bitiş tarihi",
@@ -724,7 +1039,12 @@ export const CATEGORIES: Record<ItemCategory, CategorySpec> = {
         hint: "Opsiyonel",
         essential: false,
       },
-      { key: "wantToCancel", label: "İptal etmek istiyor musun?", type: "boolean", essential: false },
+      {
+        key: "wantToCancel",
+        label: "İptal etmek istiyor musun?",
+        type: "boolean",
+        essential: false,
+      },
       f.notes(),
     ],
     reminders: [
@@ -756,9 +1076,21 @@ export const CATEGORIES: Record<ItemCategory, CategorySpec> = {
     successMessage: "Servis kaydı oluşturuldu. Takip hatırlatması kuruldu.",
     defaultDocumentTypes: ["service_form", "invoice", "other"],
     fields: [
-      { key: "title", label: "Servis adı", type: "text", required: true, topLevel: true, essential: true },
+      {
+        key: "title",
+        label: "Servis adı",
+        type: "text",
+        required: true,
+        topLevel: true,
+        essential: true,
+      },
       f.brand("Servis firması"),
-      { key: "serviceDate", label: "Servis tarihi", type: "date", essential: true },
+      {
+        key: "serviceDate",
+        label: "Servis tarihi",
+        type: "date",
+        essential: true,
+      },
       {
         key: "serviceStatus",
         label: "Servis durumu",
@@ -770,11 +1102,34 @@ export const CATEGORIES: Record<ItemCategory, CategorySpec> = {
           { value: "completed", label: "Tamamlandı" },
         ],
       },
-      { key: "description", label: "Açıklama", type: "textarea", essential: true },
+      {
+        key: "description",
+        label: "Açıklama",
+        type: "textarea",
+        essential: true,
+      },
       // Detaylı
-      { key: "relatedItem", label: "Bağlı ürün/araç", type: "text", hint: "Opsiyonel", essential: false },
-      { key: "followUpDate", label: "Takip tarihi", type: "date", hint: "Opsiyonel", essential: false },
-      { key: "amount", label: "Ücret (₺)", type: "currency", hint: "Opsiyonel", essential: false },
+      {
+        key: "relatedItem",
+        label: "Bağlı ürün/araç",
+        type: "text",
+        hint: "Opsiyonel",
+        essential: false,
+      },
+      {
+        key: "followUpDate",
+        label: "Takip tarihi",
+        type: "date",
+        hint: "Opsiyonel",
+        essential: false,
+      },
+      {
+        key: "amount",
+        label: "Ücret (₺)",
+        type: "currency",
+        hint: "Opsiyonel",
+        essential: false,
+      },
       f.notes(),
     ],
     reminders: [
@@ -782,7 +1137,8 @@ export const CATEGORIES: Record<ItemCategory, CategorySpec> = {
         type: "service_follow_up",
         fieldKey: "followUpDate",
         titleTemplate: "Servis takip tarihi yaklaşıyor",
-        bodyTemplate: "{{title}} için servis takibine {{daysBefore}} gün kaldı.",
+        bodyTemplate:
+          "{{title}} için servis takibine {{daysBefore}} gün kaldı.",
         notifyBeforeDays: [...DEFAULT_NOTIFY_DAYS.return],
       },
     ],
@@ -799,12 +1155,31 @@ export const CATEGORIES: Record<ItemCategory, CategorySpec> = {
     successMessage: "Kayıt oluşturuldu. Hatırlatma kuruldu.",
     defaultDocumentTypes: ["other"],
     fields: [
-      { key: "title", label: "Kayıt adı", type: "text", required: true, topLevel: true, essential: true },
+      {
+        key: "title",
+        label: "Kayıt adı",
+        type: "text",
+        required: true,
+        topLevel: true,
+        essential: true,
+      },
       { key: "date", label: "Tarih", type: "date", essential: true },
       // Detaylı
       f.brand("Kurum / marka", false),
-      { key: "deadline", label: "Son tarih", type: "date", hint: "Opsiyonel", essential: false },
-      { key: "amount", label: "Tutar (₺)", type: "currency", hint: "Opsiyonel", essential: false },
+      {
+        key: "deadline",
+        label: "Son tarih",
+        type: "date",
+        hint: "Opsiyonel",
+        essential: false,
+      },
+      {
+        key: "amount",
+        label: "Tutar (₺)",
+        type: "currency",
+        hint: "Opsiyonel",
+        essential: false,
+      },
       f.notes(),
     ],
     reminders: [

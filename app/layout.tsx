@@ -44,9 +44,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="tr">
-      <body >
-        {children}
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

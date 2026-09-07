@@ -102,7 +102,18 @@ export function DocumentPickerModal({
   };
 
   const onFile = async () => {
-    try { const result = await DocumentPicker.getDocumentAsync({ type: ["application/pdf", "image/jpeg", "image/png"], copyToCacheDirectory: true }); if (!result.canceled) { onPick(result.assets[0].uri, selectedType); onClose(); } } catch { Alert.alert("Dosya seçilemedi", "Lütfen tekrar dene."); }
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: ["application/pdf", "image/jpeg", "image/png"],
+        copyToCacheDirectory: true,
+      });
+      if (!result.canceled) {
+        onPick(result.assets[0].uri, selectedType);
+        onClose();
+      }
+    } catch {
+      Alert.alert("Dosya seçilemedi", "Lütfen tekrar dene.");
+    }
   };
 
   const onCamera = async () => {
@@ -149,13 +160,19 @@ export function DocumentPickerModal({
           <Pressable
             onPress={onClose}
             hitSlop={12}
-            style={({ pressed }) => [styles.closeBtn, pressed && { opacity: 0.7 }]}
+            style={({ pressed }) => [
+              styles.closeBtn,
+              pressed && { opacity: 0.7 },
+            ]}
           >
             <Ionicons name="close" size={22} color={colors.ink[700]} />
           </Pressable>
         </View>
 
-        <ScrollView contentContainerStyle={styles.body} keyboardShouldPersistTaps="handled">
+        <ScrollView
+          contentContainerStyle={styles.body}
+          keyboardShouldPersistTaps="handled"
+        >
           <Text style={styles.sectionLabel}>Belge tipi</Text>
           <ScrollView
             horizontal
@@ -176,7 +193,9 @@ export function DocumentPickerModal({
                     },
                   ]}
                 >
-                  <Text style={[styles.chipText, active && { color: colors.white }]}>
+                  <Text
+                    style={[styles.chipText, active && { color: colors.white }]}
+                  >
                     {t.label}
                   </Text>
                 </Pressable>
@@ -185,30 +204,52 @@ export function DocumentPickerModal({
           </ScrollView>
 
           {!showAllTypes && ALL_TYPES.length > visibleTypes.length && (
-            <Pressable onPress={() => setShowAllTypes(true)} style={styles.toggleAll}>
-              <Text style={styles.toggleText}>Diğer belge tiplerini göster</Text>
+            <Pressable
+              onPress={() => setShowAllTypes(true)}
+              style={styles.toggleAll}
+            >
+              <Text style={styles.toggleText}>
+                Diğer belge tiplerini göster
+              </Text>
             </Pressable>
           )}
 
           <View style={styles.preview}>
-            <Ionicons name="document-attach-outline" size={28} color={colors.brand[700]} />
+            <Ionicons
+              name="document-attach-outline"
+              size={28}
+              color={colors.brand[700]}
+            />
             <Text style={styles.previewText}>
-              Seçilen tip: <Text style={{ fontWeight: "700" }}>{typeLabel(selectedType)}</Text>
+              Seçilen tip:{" "}
+              <Text style={{ fontWeight: "700" }}>
+                {typeLabel(selectedType)}
+              </Text>
             </Text>
             <Text style={styles.previewHint}>
-              Belge eklendikten sonra detay ekranında her zaman görüntüleyebilirsin.
+              Belge eklendikten sonra detay ekranında her zaman
+              görüntüleyebilirsin.
             </Text>
           </View>
 
           <View style={{ gap: spacing.sm, marginTop: spacing.lg }}>
-            <Button title="PDF veya dosya seç" onPress={onFile} variant="outline" fullWidth />
+            <Button
+              title="PDF veya dosya seç"
+              onPress={onFile}
+              variant="outline"
+              fullWidth
+            />
             <Button
               title="Galeriden seç"
               onPress={onGallery}
               loading={busy}
               fullWidth
               leftIcon={
-                <Ionicons name="images-outline" size={18} color={colors.white} />
+                <Ionicons
+                  name="images-outline"
+                  size={18}
+                  color={colors.white}
+                />
               }
             />
             <Button
@@ -218,7 +259,11 @@ export function DocumentPickerModal({
               loading={busy}
               fullWidth
               leftIcon={
-                <Ionicons name="camera-outline" size={18} color={colors.ink[800]} />
+                <Ionicons
+                  name="camera-outline"
+                  size={18}
+                  color={colors.ink[800]}
+                />
               }
             />
           </View>

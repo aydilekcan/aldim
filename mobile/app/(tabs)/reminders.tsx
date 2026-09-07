@@ -31,15 +31,51 @@ interface FilterChip {
 
 const FILTERS: FilterChip[] = [
   { id: "all", label: "Tümü", filter: "all" },
-  { id: "cat:electronics", label: "Elektronik", filter: { kind: "category", category: "electronics" } },
-  { id: "cat:vehicle", label: "Araç", filter: { kind: "category", category: "vehicle" } },
-  { id: "cat:home_bill", label: "Fatura", filter: { kind: "category", category: "home_bill" } },
-  { id: "cat:subscription", label: "Abonelik", filter: { kind: "category", category: "subscription" } },
-  { id: "cat:insurance", label: "Sigorta", filter: { kind: "category", category: "insurance" } },
-  { id: "type:return_deadline", label: "İade", filter: { kind: "type", type: "return_deadline" } },
-  { id: "type:warranty_end", label: "Garanti", filter: { kind: "type", type: "warranty_end" } },
-  { id: "type:bill_due", label: "Fatura ödeme", filter: { kind: "type", type: "bill_due" } },
-  { id: "type:vehicle_inspection", label: "Muayene", filter: { kind: "type", type: "vehicle_inspection" } },
+  {
+    id: "cat:electronics",
+    label: "Elektronik",
+    filter: { kind: "category", category: "electronics" },
+  },
+  {
+    id: "cat:vehicle",
+    label: "Araç",
+    filter: { kind: "category", category: "vehicle" },
+  },
+  {
+    id: "cat:home_bill",
+    label: "Fatura",
+    filter: { kind: "category", category: "home_bill" },
+  },
+  {
+    id: "cat:subscription",
+    label: "Abonelik",
+    filter: { kind: "category", category: "subscription" },
+  },
+  {
+    id: "cat:insurance",
+    label: "Sigorta",
+    filter: { kind: "category", category: "insurance" },
+  },
+  {
+    id: "type:return_deadline",
+    label: "İade",
+    filter: { kind: "type", type: "return_deadline" },
+  },
+  {
+    id: "type:warranty_end",
+    label: "Garanti",
+    filter: { kind: "type", type: "warranty_end" },
+  },
+  {
+    id: "type:bill_due",
+    label: "Fatura ödeme",
+    filter: { kind: "type", type: "bill_due" },
+  },
+  {
+    id: "type:vehicle_inspection",
+    label: "Muayene",
+    filter: { kind: "type", type: "vehicle_inspection" },
+  },
   { id: "type:mtv", label: "MTV", filter: { kind: "type", type: "mtv" } },
 ];
 
@@ -54,7 +90,8 @@ export default function RemindersScreen() {
       .filter((r) => {
         if (activeFilter === "all") return true;
         if (typeof activeFilter === "object") {
-          if (activeFilter.kind === "category") return r.itemCategory === activeFilter.category;
+          if (activeFilter.kind === "category")
+            return r.itemCategory === activeFilter.category;
           if (activeFilter.kind === "type") return r.type === activeFilter.type;
         }
         return true;
@@ -92,7 +129,9 @@ export default function RemindersScreen() {
                   },
                 ]}
               >
-                <Text style={[styles.chipText, active && { color: colors.white }]}>
+                <Text
+                  style={[styles.chipText, active && { color: colors.white }]}
+                >
                   {f.label}
                 </Text>
               </Pressable>
@@ -105,7 +144,11 @@ export default function RemindersScreen() {
         ) : filtered.length === 0 ? (
           <EmptyState
             icon={
-              <Ionicons name="notifications-outline" size={28} color={colors.brand[700]} />
+              <Ionicons
+                name="notifications-outline"
+                size={28}
+                color={colors.brand[700]}
+              />
             }
             title="Yaklaşan bir hatırlatma yok"
             description="Kayıt ekledikçe önemli tarihler burada görünür."
@@ -115,7 +158,39 @@ export default function RemindersScreen() {
             {filtered.map((r) => (
               <View key={r.id}>
                 <ReminderRow reminder={r} />
-                <Pressable onPress={() => Alert.alert("Tamamla", ["bill_due","subscription_renewal"].includes(r.type) ? "Bu ödeme harcama geçmişine kaydedilecek." : "Hatırlatma tamamlandı olarak işaretlenecek.", [{text:"Vazgeç",style:"cancel"},{text:"Tamamla",onPress:async()=>{try{await completeReminder(r.id);}catch(e){Alert.alert("Kaydedilemedi",(e as Error).message);}}}])} style={{padding:12,alignItems:"flex-end"}}><Text style={{color:colors.brand[700],fontWeight:"600"}}>{["bill_due","subscription_renewal"].includes(r.type)?"Ödendi olarak işaretle":"Tamamla"}</Text></Pressable>
+                <Pressable
+                  onPress={() =>
+                    Alert.alert(
+                      "Tamamla",
+                      ["bill_due", "subscription_renewal"].includes(r.type)
+                        ? "Bu ödeme harcama geçmişine kaydedilecek."
+                        : "Hatırlatma tamamlandı olarak işaretlenecek.",
+                      [
+                        { text: "Vazgeç", style: "cancel" },
+                        {
+                          text: "Tamamla",
+                          onPress: async () => {
+                            try {
+                              await completeReminder(r.id);
+                            } catch (e) {
+                              Alert.alert(
+                                "Kaydedilemedi",
+                                (e as Error).message,
+                              );
+                            }
+                          },
+                        },
+                      ],
+                    )
+                  }
+                  style={{ padding: 12, alignItems: "flex-end" }}
+                >
+                  <Text style={{ color: colors.brand[700], fontWeight: "600" }}>
+                    {["bill_due", "subscription_renewal"].includes(r.type)
+                      ? "Ödendi olarak işaretle"
+                      : "Tamamla"}
+                  </Text>
+                </Pressable>
                 <Text style={styles.category}>
                   {CATEGORIES[r.itemCategory].label} · {r.itemTitle}
                 </Text>

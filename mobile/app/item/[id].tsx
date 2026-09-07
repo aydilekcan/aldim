@@ -2,7 +2,15 @@ import { ServiceHistory } from "../../components/ServiceHistory";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
-import { Alert, Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Alert,
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Badge } from "../../components/Badge";
 import { Button } from "../../components/Button";
@@ -11,7 +19,11 @@ import { EmptyState } from "../../components/EmptyState";
 import { ReminderRow } from "../../components/ReminderRow";
 import { DocumentPickerModal } from "../../components/DocumentPickerModal";
 import { CATEGORIES } from "../../lib/categories";
-import { formatCurrencyTRY, formatDateTR, todayIso } from "../../lib/date-utils";
+import {
+  formatCurrencyTRY,
+  formatDateTR,
+  todayIso,
+} from "../../lib/date-utils";
 import { useAldimStore } from "../../lib/store";
 import { colors, fontSize, radius, spacing } from "../../lib/theme";
 import type { ItemFieldValue } from "../../lib/types";
@@ -33,10 +45,7 @@ function BackToItems({ router }: { router: ReturnType<typeof useRouter> }) {
         else router.replace("/(tabs)/items");
       }}
       hitSlop={12}
-      style={({ pressed }) => [
-        styles.backBtn,
-        pressed && { opacity: 0.7 },
-      ]}
+      style={({ pressed }) => [styles.backBtn, pressed && { opacity: 0.7 }]}
     >
       <Ionicons name="chevron-back" size={24} color={colors.brand[700]} />
       <Text style={styles.backText}>Kayıtlar</Text>
@@ -79,7 +88,12 @@ export default function ItemDetailScreen() {
           text: "Sil",
           style: "destructive",
           onPress: async () => {
-            try { await deleteItem(item.id); router.back(); } catch (error) { Alert.alert("Silinemedi", (error as Error).message); }
+            try {
+              await deleteItem(item.id);
+              router.back();
+            } catch (error) {
+              Alert.alert("Silinemedi", (error as Error).message);
+            }
           },
         },
       ],
@@ -115,10 +129,16 @@ export default function ItemDetailScreen() {
           {(item.price !== undefined || item.purchaseDate) && (
             <View style={styles.metaRow}>
               {item.price !== undefined && (
-                <InfoBlock label="Fiyat" value={formatCurrencyTRY(item.price)} />
+                <InfoBlock
+                  label="Fiyat"
+                  value={formatCurrencyTRY(item.price)}
+                />
               )}
               {item.purchaseDate && (
-                <InfoBlock label="Satın alma" value={formatDateTR(item.purchaseDate)} />
+                <InfoBlock
+                  label="Satın alma"
+                  value={formatDateTR(item.purchaseDate)}
+                />
               )}
             </View>
           )}
@@ -211,7 +231,11 @@ export default function ItemDetailScreen() {
         <Card style={{ gap: spacing.sm }}>
           <View style={styles.docHeaderRow}>
             <View style={styles.iconRow}>
-              <Ionicons name="folder-outline" size={18} color={colors.brand[700]} />
+              <Ionicons
+                name="folder-outline"
+                size={18}
+                color={colors.brand[700]}
+              />
               <CardTitle>Belgeler</CardTitle>
             </View>
             {item.documents.length > 0 && (
@@ -257,7 +281,10 @@ export default function ItemDetailScreen() {
                   ]}
                 >
                   {d.fileUri ? (
-                    <Image source={{ uri: d.fileUri }} style={styles.docThumb} />
+                    <Image
+                      source={{ uri: d.fileUri }}
+                      style={styles.docThumb}
+                    />
                   ) : (
                     <View style={[styles.docThumb, styles.docThumbEmpty]}>
                       <Ionicons
@@ -304,7 +331,12 @@ export default function ItemDetailScreen() {
             />
           </View>
           <View style={{ flex: 1 }}>
-            <Button title="Sil" variant="outline" onPress={onDelete} fullWidth />
+            <Button
+              title="Sil"
+              variant="outline"
+              onPress={onDelete}
+              fullWidth
+            />
           </View>
         </View>
       </ScrollView>
@@ -314,20 +346,23 @@ export default function ItemDetailScreen() {
         category={item.category}
         onClose={() => setDocPickerOpen(false)}
         onPick={async (fileUri, type) => {
-          try { const created = await addDocumentToItem(item.id, {
-            type,
-            date: todayIso(),
-            fileUri,
-          });
-          if (created) {
-            Alert.alert("Belge eklendi", `"${created.name}" kayda eklendi.`);
-          } else {
-            Alert.alert(
-              "Belge kaydedilemedi",
-              "Lütfen tekrar dene. Görsel cihazdan okunamadıysa farklı bir belge seç.",
-            );
+          try {
+            const created = await addDocumentToItem(item.id, {
+              type,
+              date: todayIso(),
+              fileUri,
+            });
+            if (created) {
+              Alert.alert("Belge eklendi", `"${created.name}" kayda eklendi.`);
+            } else {
+              Alert.alert(
+                "Belge kaydedilemedi",
+                "Lütfen tekrar dene. Görsel cihazdan okunamadıysa farklı bir belge seç.",
+              );
+            }
+          } catch (error) {
+            Alert.alert("Belge yüklenemedi", (error as Error).message);
           }
-          } catch (error) { Alert.alert("Belge yüklenemedi", (error as Error).message); }
         }}
       />
     </SafeAreaView>

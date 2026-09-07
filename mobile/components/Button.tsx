@@ -1,4 +1,10 @@
-import { Pressable, StyleSheet, Text, View, ActivityIndicator } from "react-native";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  ActivityIndicator,
+} from "react-native";
 import type { PressableProps } from "react-native";
 import { colors, radius, spacing, fontSize } from "../lib/theme";
 
@@ -15,11 +21,23 @@ interface Props extends Omit<PressableProps, "style"> {
 }
 
 const VARIANT_STYLE = {
-  primary: { bg: colors.brand[700], text: colors.white, border: colors.brand[700] },
-  secondary: { bg: colors.accent[500], text: colors.white, border: colors.accent[500] },
+  primary: {
+    bg: colors.brand[700],
+    text: colors.white,
+    border: colors.brand[700],
+  },
+  secondary: {
+    bg: colors.accent[500],
+    text: colors.white,
+    border: colors.accent[500],
+  },
   ghost: { bg: "transparent", text: colors.ink[800], border: "transparent" },
   outline: { bg: colors.white, text: colors.ink[800], border: colors.ink[200] },
-  danger: { bg: colors.danger[500], text: colors.white, border: colors.danger[500] },
+  danger: {
+    bg: colors.danger[500],
+    text: colors.white,
+    border: colors.danger[500],
+  },
 } as const;
 
 const SIZE_STYLE = {

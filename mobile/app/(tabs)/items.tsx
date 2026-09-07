@@ -1,13 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
-import {
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button } from "../../components/Button";
 import { EmptyState } from "../../components/EmptyState";
@@ -83,7 +77,9 @@ export default function ItemsScreen() {
                   },
                 ]}
               >
-                <Text style={[styles.chipText, active && { color: colors.white }]}>
+                <Text
+                  style={[styles.chipText, active && { color: colors.white }]}
+                >
                   {filterLabel(f)}
                 </Text>
               </Pressable>
@@ -95,7 +91,13 @@ export default function ItemsScreen() {
           <View style={styles.skeleton} />
         ) : filtered.length === 0 ? (
           <EmptyState
-            icon={<Ionicons name="albums-outline" size={28} color={colors.brand[700]} />}
+            icon={
+              <Ionicons
+                name="albums-outline"
+                size={28}
+                color={colors.brand[700]}
+              />
+            }
             title={
               filter === "all" ? "Henüz kayıt yok" : "Bu kategoride kayıt yok"
             }

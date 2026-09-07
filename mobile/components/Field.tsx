@@ -73,7 +73,12 @@ export function DateField({
           pressed && { opacity: 0.7 },
         ]}
       >
-        <Text style={{ color: value ? colors.ink[900] : colors.ink[400], fontSize: fontSize.base }}>
+        <Text
+          style={{
+            color: value ? colors.ink[900] : colors.ink[400],
+            fontSize: fontSize.base,
+          }}
+        >
           {value ? formatDateTR(value) : placeholder}
         </Text>
       </Pressable>
@@ -88,11 +93,10 @@ export function DateField({
             locale="tr-TR"
           />
           {Platform.OS === "ios" && (
-            <Pressable
-              style={styles.iosDone}
-              onPress={() => setOpen(false)}
-            >
-              <Text style={{ color: colors.brand[700], fontWeight: "600" }}>Tamam</Text>
+            <Pressable style={styles.iosDone} onPress={() => setOpen(false)}>
+              <Text style={{ color: colors.brand[700], fontWeight: "600" }}>
+                Tamam
+              </Text>
             </Pressable>
           )}
         </View>

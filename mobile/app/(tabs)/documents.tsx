@@ -89,7 +89,9 @@ export default function DocumentsScreen() {
                   },
                 ]}
               >
-                <Text style={[styles.chipText, active && { color: colors.white }]}>
+                <Text
+                  style={[styles.chipText, active && { color: colors.white }]}
+                >
                   {f.label}
                 </Text>
               </Pressable>
@@ -101,7 +103,13 @@ export default function DocumentsScreen() {
           <View style={styles.skeleton} />
         ) : docs.length === 0 ? (
           <EmptyState
-            icon={<Ionicons name="folder-outline" size={28} color={colors.brand[700]} />}
+            icon={
+              <Ionicons
+                name="folder-outline"
+                size={28}
+                color={colors.brand[700]}
+              />
+            }
             title="Henüz belge eklemedin"
             description="Bir kayıt detayına girip belge ekleyebilirsin."
           />
@@ -111,13 +119,20 @@ export default function DocumentsScreen() {
               <Pressable
                 key={d.id}
                 onPress={() => router.push(`/document/${d.id}`)}
-                style={({ pressed }) => [styles.row, pressed && { opacity: 0.92 }]}
+                style={({ pressed }) => [
+                  styles.row,
+                  pressed && { opacity: 0.92 },
+                ]}
               >
                 {d.fileUri ? (
                   <Image source={{ uri: d.fileUri }} style={styles.thumb} />
                 ) : (
                   <View style={[styles.thumb, styles.thumbEmpty]}>
-                    <Ionicons name="document-outline" size={22} color={colors.brand[700]} />
+                    <Ionicons
+                      name="document-outline"
+                      size={22}
+                      color={colors.brand[700]}
+                    />
                   </View>
                 )}
                 <View style={{ flex: 1, minWidth: 0 }}>

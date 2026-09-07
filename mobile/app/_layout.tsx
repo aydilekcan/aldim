@@ -17,10 +17,21 @@ function RouteGate() {
   useEffect(() => {
     const open = (response: Notifications.NotificationResponse) => {
       const itemId = response.notification.request.content.data?.itemId;
-      if (user && typeof itemId === "string" && /^[0-9a-f-]{36}$/i.test(itemId)) router.push(`/item/${itemId}`);
+      if (user && typeof itemId === "string" && /^[0-9a-f-]{36}$/i.test(itemId))
+        router.push(`/item/${itemId}`);
     };
-    const subscription = Notifications.addNotificationResponseReceivedListener(open);
-    void Notifications.getLastNotificationResponseAsync().then(response => { if (response) { open(response); void Notifications.clearLastNotificationResponseAsync().catch(() => {}); } }).catch(() => {});
+    const subscription =
+      Notifications.addNotificationResponseReceivedListener(open);
+    void Notifications.getLastNotificationResponseAsync()
+      .then((response) => {
+        if (response) {
+          open(response);
+          void Notifications.clearLastNotificationResponseAsync().catch(
+            () => {},
+          );
+        }
+      })
+      .catch(() => {});
     return () => subscription.remove();
   }, [user, router]);
 
@@ -47,20 +58,32 @@ function RouteGate() {
     if (inAuth || inOnboarding) {
       router.replace("/(tabs)");
     }
-  }, [authLoading, hydrated, settings.onboardingComplete, user, segments, router]);
+  }, [
+    authLoading,
+    hydrated,
+    settings.onboardingComplete,
+    user,
+    segments,
+    router,
+  ]);
 
   return null;
 }
 
-
 function UserStore({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
-  return <AldimStoreProvider key={user?.id ?? 'signed-out'}>{children}</AldimStoreProvider>;
+  return (
+    <AldimStoreProvider key={user?.id ?? "signed-out"}>
+      {children}
+    </AldimStoreProvider>
+  );
 }
 
 export default function RootLayout() {
   return (
-    <GestureHandlerRootView style={{ flex: 1, backgroundColor: colors.ink[50] }}>
+    <GestureHandlerRootView
+      style={{ flex: 1, backgroundColor: colors.ink[50] }}
+    >
       <SafeAreaProvider>
         <AuthProvider>
           <UserStore>
@@ -79,20 +102,32 @@ export default function RootLayout() {
                 headerBackButtonDisplayMode: "minimal",
               }}
             >
-              <Stack.Screen name="onboarding" options={{ headerShown: false }} />
-              <Stack.Screen name="auth/welcome" options={{ headerShown: false }} />
-              <Stack.Screen name="auth/sign-in" options={{ title: "Giriş yap" }} />
-              <Stack.Screen name="auth/sign-up" options={{ title: "Hesap oluştur" }} />
+              <Stack.Screen
+                name="onboarding"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="auth/welcome"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="auth/sign-in"
+                options={{ title: "Giriş yap" }}
+              />
+              <Stack.Screen
+                name="auth/sign-up"
+                options={{ title: "Hesap oluştur" }}
+              />
               <Stack.Screen
                 name="auth/forgot-password"
                 options={{ title: "Şifremi unuttum" }}
               />
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="item/new" options={{ title: "Yeni kayıt" }} />
               <Stack.Screen
-                name="item/new"
-                options={{ title: "Yeni kayıt" }}
+                name="item/[id]"
+                options={{ title: "Kayıt detayı" }}
               />
-              <Stack.Screen name="item/[id]" options={{ title: "Kayıt detayı" }} />
               <Stack.Screen
                 name="item/[id]/edit"
                 options={{ title: "Düzenle" }}

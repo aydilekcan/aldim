@@ -1,48 +1,728 @@
-'use client';
-import Link from 'next/link';
-import { useState } from 'react';
-import { ArrowDownLeft, ArrowRight, ArrowUpRight, Bell, Check, ChevronRight, FileText, FolderOpen, Layers, Plus, Search, ShieldCheck, Sparkles, Wallet, CreditCard, Car, Smartphone, Download, Trash2, AlertCircle } from 'lucide-react';
-import { useAldimStore } from '@/lib/store';
-import { CATEGORIES } from '@/shared/categories';
-import { daysUntil, formatCurrencyTRY, formatDateTR, humanizeDaysLeft } from '@/shared/date-utils';
-import { DOCUMENT_LABELS, itemAmount, spendingSummary } from '@/shared/domain';
-import type { AldimItem, Reminder, AldimDocument, ItemCategory } from '@/shared/types';
-import { downloadDocument } from '@/lib/documents';
+"use client";
+import Link from "next/link";
+import { useState } from "react";
+import {
+  ArrowDownLeft,
+  ArrowRight,
+  ArrowUpRight,
+  Bell,
+  Check,
+  ChevronRight,
+  FileText,
+  FolderOpen,
+  Layers,
+  Plus,
+  Search,
+  ShieldCheck,
+  Sparkles,
+  Wallet,
+  CreditCard,
+  Car,
+  Smartphone,
+  Download,
+  Trash2,
+  AlertCircle,
+} from "lucide-react";
+import { useAldimStore } from "@/lib/store";
+import { CATEGORIES } from "@/shared/categories";
+import {
+  daysUntil,
+  formatCurrencyTRY,
+  formatDateTR,
+  humanizeDaysLeft,
+} from "@/shared/date-utils";
+import { DOCUMENT_LABELS, itemAmount, spendingSummary } from "@/shared/domain";
+import type {
+  AldimItem,
+  Reminder,
+  AldimDocument,
+  ItemCategory,
+} from "@/shared/types";
+import { downloadDocument } from "@/lib/documents";
 
-export function PageHeading({eyebrow,title,description,action}: {eyebrow?:string;title:string;description:string;action?:React.ReactNode}) { return <div className="page-heading"><div>{eyebrow&&<div className="eyebrow">{eyebrow}</div>}<h1>{title}</h1><p>{description}</p></div>{action}</div>; }
-export const AddLink=()=> <Link className="primary" href="/app/items/new"><Plus size={18}/> Yeni kayıt ekle</Link>;
-export function Empty({title,description,href,label='İlk kaydını ekle'}:{title:string;description:string;href?:string;label?:string}) {return <div className="empty"><div className="empty-icon"><FolderOpen size={27}/></div><h3>{title}</h3><p>{description}</p>{href&&<Link className="primary small" href={href}><Plus size={16}/>{label}</Link>}</div>;}
-const CategoryIcon=({category}:{category:string})=>category==='vehicle'?<Car size={22}/>:category==='subscription'?<CreditCard size={22}/>:category==='home_bill'?<FileText size={22}/>:<Smartphone size={22}/>;
-export function RecordRow({item}:{item:AldimItem}) { return <Link className="record-row" href={`/app/items/${item.id}`}><div className={`item-icon ${item.category}`}><CategoryIcon category={item.category}/></div><div className="row-main"><strong>{item.title}</strong><span>{CATEGORIES[item.category].label}{item.brand?` · ${item.brand}`:''}</span></div><div className="row-end"><strong>{itemAmount(item)>0?formatCurrencyTRY(itemAmount(item)):'Tutar eklenmedi'}</strong><span>{item.documents.length} belge</span></div><ChevronRight size={17} className="muted"/></Link>; }
-export function ReminderLine({reminder,compact=false}:{reminder:Reminder;compact?:boolean}) {
- const {completeReminder,busy}=useAldimStore();const [error,setError]=useState('');const left=daysUntil(reminder.dueDate);const payment=['bill_due','subscription_renewal'].includes(reminder.type);
- return <div className="reminder-line"><div className={`date-box ${left<0?'overdue':left<=3?'soon':''}`}><strong>{reminder.dueDate.slice(-2)}</strong><span>{new Date(`${reminder.dueDate}T12:00:00`).toLocaleDateString('tr-TR',{month:'short'})}</span></div><Link className="row-main" href={`/app/items/${reminder.itemId}`}><strong>{reminder.itemTitle}</strong><span>{reminder.title}</span></Link><div className="row-end"><span className={`pill ${left<0?'danger':left<=3?'warning':'neutral'}`}>{reminder.status==='completed'?'Tamamlandı':humanizeDaysLeft(reminder.dueDate)}</span>{!compact&&reminder.status!=='completed'&&<button className="text-button" disabled={busy} onClick={async()=>{setError('');try{await completeReminder(reminder.id);}catch(e){setError((e as Error).message);}}}><Check size={15}/>{payment?'Ödendi olarak işaretle':'Tamamla'}</button>}{error&&<span role="alert" className="error">{error}</span>}</div></div>;
+export function PageHeading({
+  eyebrow,
+  title,
+  description,
+  action,
+}: {
+  eyebrow?: string;
+  title: string;
+  description: string;
+  action?: React.ReactNode;
+}) {
+  return (
+    <div className="page-heading">
+      <div>
+        {eyebrow && <div className="eyebrow">{eyebrow}</div>}
+        <h1>{title}</h1>
+        <p>{description}</p>
+      </div>
+      {action}
+    </div>
+  );
+}
+export const AddLink = () => (
+  <Link className="primary" href="/app/items/new">
+    <Plus size={18} /> Yeni kayıt ekle
+  </Link>
+);
+export function Empty({
+  title,
+  description,
+  href,
+  label = "İlk kaydını ekle",
+}: {
+  title: string;
+  description: string;
+  href?: string;
+  label?: string;
+}) {
+  return (
+    <div className="empty">
+      <div className="empty-icon">
+        <FolderOpen size={27} />
+      </div>
+      <h3>{title}</h3>
+      <p>{description}</p>
+      {href && (
+        <Link className="primary small" href={href}>
+          <Plus size={16} />
+          {label}
+        </Link>
+      )}
+    </div>
+  );
+}
+const CategoryIcon = ({ category }: { category: string }) =>
+  category === "vehicle" ? (
+    <Car size={22} />
+  ) : category === "subscription" ? (
+    <CreditCard size={22} />
+  ) : category === "home_bill" ? (
+    <FileText size={22} />
+  ) : (
+    <Smartphone size={22} />
+  );
+export function RecordRow({ item }: { item: AldimItem }) {
+  return (
+    <Link className="record-row" href={`/app/items/${item.id}`}>
+      <div className={`item-icon ${item.category}`}>
+        <CategoryIcon category={item.category} />
+      </div>
+      <div className="row-main">
+        <strong>{item.title}</strong>
+        <span>
+          {CATEGORIES[item.category].label}
+          {item.brand ? ` · ${item.brand}` : ""}
+        </span>
+      </div>
+      <div className="row-end">
+        <strong>
+          {itemAmount(item) > 0
+            ? formatCurrencyTRY(itemAmount(item))
+            : "Tutar eklenmedi"}
+        </strong>
+        <span>{item.documents.length} belge</span>
+      </div>
+      <ChevronRight size={17} className="muted" />
+    </Link>
+  );
+}
+export function ReminderLine({
+  reminder,
+  compact = false,
+}: {
+  reminder: Reminder;
+  compact?: boolean;
+}) {
+  const { completeReminder, busy } = useAldimStore();
+  const [error, setError] = useState("");
+  const left = daysUntil(reminder.dueDate);
+  const payment = ["bill_due", "subscription_renewal"].includes(reminder.type);
+  return (
+    <div className="reminder-line">
+      <div
+        className={`date-box ${left < 0 ? "overdue" : left <= 3 ? "soon" : ""}`}
+      >
+        <strong>{reminder.dueDate.slice(-2)}</strong>
+        <span>
+          {new Date(`${reminder.dueDate}T12:00:00`).toLocaleDateString(
+            "tr-TR",
+            { month: "short" },
+          )}
+        </span>
+      </div>
+      <Link className="row-main" href={`/app/items/${reminder.itemId}`}>
+        <strong>{reminder.itemTitle}</strong>
+        <span>{reminder.title}</span>
+      </Link>
+      <div className="row-end">
+        <span
+          className={`pill ${left < 0 ? "danger" : left <= 3 ? "warning" : "neutral"}`}
+        >
+          {reminder.status === "completed"
+            ? "Tamamlandı"
+            : humanizeDaysLeft(reminder.dueDate)}
+        </span>
+        {!compact && reminder.status !== "completed" && (
+          <button
+            className="text-button"
+            disabled={busy}
+            onClick={async () => {
+              setError("");
+              try {
+                await completeReminder(reminder.id);
+              } catch (e) {
+                setError((e as Error).message);
+              }
+            }}
+          >
+            <Check size={15} />
+            {payment ? "Ödendi olarak işaretle" : "Tamamla"}
+          </button>
+        )}
+        {error && (
+          <span role="alert" className="error">
+            {error}
+          </span>
+        )}
+      </div>
+    </div>
+  );
 }
 export function Dashboard() {
- const {items,reminders,payments}=useAldimStore();const summary=spendingSummary(items,payments);const upcoming=reminders.filter(r=>r.status!=='completed').sort((a,b)=>a.dueDate.localeCompare(b.dueDate));const overdue=upcoming.filter(r=>daysUntil(r.dueDate)<0).length;
- const quick: {category:ItemCategory;title:string;desc:string;icon:typeof Smartphone}[]=[{category:'electronics',title:'Ürün ekle',desc:'Fatura ve garantisini sakla',icon:Smartphone},{category:'home_bill',title:'Fatura ekle',desc:'Son ödeme gününü unutma',icon:FileText},{category:'subscription',title:'Abonelik ekle',desc:'Düzenli ödemelerini takip et',icon:CreditCard},{category:'vehicle',title:'Araç ekle',desc:'Bakım ve muayeneyi hatırla',icon:Car}];
- return <><PageHeading eyebrow={new Date().toLocaleDateString('tr-TR',{day:'numeric',month:'long',weekday:'long'}).toLocaleUpperCase('tr')} title="Aldıkların kontrol altında." description="Harcadığını gör, belgelerini sakla, önemli tarihleri kaçırma." action={<AddLink/>}/><div className="summary-grid"><div className="stat featured"><div className="stat-label"><Wallet size={19}/> Bu ayki harcaman</div><strong>{formatCurrencyTRY(summary.thisMonth)}</strong><span>Alışverişler ve kaydedilen ödemeler <ArrowUpRight size={16}/></span></div><div className="stat"><div className="stat-label"><CreditCard size={19}/> Aylık abonelik yükü</div><strong>{formatCurrencyTRY(summary.subscriptions)}</strong><span>{items.filter(i=>i.category==='subscription'&&i.status==='active').length} aktif abonelik</span></div><div className="stat"><div className="stat-label"><ShieldCheck size={19}/> Devam eden garantiler</div><strong>{summary.warranties}<small> ürün</small></strong><span>Garanti süresi devam edenler</span></div><div className="stat"><div className="stat-label"><FolderOpen size={19}/> Belge kasan</div><strong>{summary.documents}<small> belge</small></strong><Link href="/app/documents">Hepsi güvenle bir arada <ArrowUpRight size={16}/></Link></div></div><div className="quick-section"><div className="section-heading"><h2>Bugün ne eklemek istersin?</h2><span>Bir dakikada düzenlemeye başla</span></div><div className="quick-grid">{quick.map(q=><Link key={q.category} href={`/app/items/new?category=${q.category}`} className="quick-card"><div className={`quick-icon ${q.category}`}><q.icon size={22}/></div><div><strong>{q.title}</strong><span>{q.desc}</span></div><Plus size={19}/></Link>)}</div></div><div className="dashboard-columns"><section className="panel"><div className="panel-heading"><h2><Bell size={19}/> Yaklaşan tarihler <span className="count">{upcoming.length}</span></h2><Link href="/app/reminders">Tümünü gör <ArrowRight size={15}/></Link></div>{overdue>0&&<div className="inline-notice"><AlertCircle size={16}/>{overdue} tarihin geçti. Kontrol ederek tamamlandı olarak işaretleyebilirsin.</div>}{upcoming.length?upcoming.slice(0,4).map(r=><ReminderLine key={r.id} reminder={r} compact/>):<Empty title="Takviminde her şey yolunda." description={items.length?'Yaklaşan bir tarih yok. Yeni tarih eklediğinde burada göreceksin.':'İlk kaydını ekle; önemli tarihleri senin için bir araya getirelim.'} href={items.length?undefined:'/app/items/new'}/>}</section><section className="panel"><div className="panel-heading"><h2><Layers size={19}/> Son eklenenler</h2><Link href="/app/items">Tümünü gör <ArrowRight size={15}/></Link></div>{items.length?items.slice(0,4).map(item=><RecordRow key={item.id} item={item}/>):<Empty title="Yeni bir başlangıç." description="Bir ürün, fatura veya abonelik ekleyerek kişisel arşivini oluşturmaya başla."/>}</section></div><div className="tip-banner"><div className="tip-icon"><Sparkles size={23}/></div><div><strong>Bir fotoğraf çek. Bir daha arama.</strong><p>Fatura ve garanti belgelerini kaydına ekle, istediğin zaman PDF olarak indir.</p></div><Link href="/app/documents">Belge kasasına git <ArrowRight size={17}/></Link></div></>;
+  const { items, reminders, payments } = useAldimStore();
+  const summary = spendingSummary(items, payments);
+  const upcoming = reminders
+    .filter((r) => r.status !== "completed")
+    .sort((a, b) => a.dueDate.localeCompare(b.dueDate));
+  const overdue = upcoming.filter((r) => daysUntil(r.dueDate) < 0).length;
+  const quick: {
+    category: ItemCategory;
+    title: string;
+    desc: string;
+    icon: typeof Smartphone;
+  }[] = [
+    {
+      category: "electronics",
+      title: "Ürün ekle",
+      desc: "Fatura ve garantisini sakla",
+      icon: Smartphone,
+    },
+    {
+      category: "home_bill",
+      title: "Fatura ekle",
+      desc: "Son ödeme gününü unutma",
+      icon: FileText,
+    },
+    {
+      category: "subscription",
+      title: "Abonelik ekle",
+      desc: "Düzenli ödemelerini takip et",
+      icon: CreditCard,
+    },
+    {
+      category: "vehicle",
+      title: "Araç ekle",
+      desc: "Bakım ve muayeneyi hatırla",
+      icon: Car,
+    },
+  ];
+  return (
+    <>
+      <PageHeading
+        eyebrow={new Date()
+          .toLocaleDateString("tr-TR", {
+            day: "numeric",
+            month: "long",
+            weekday: "long",
+          })
+          .toLocaleUpperCase("tr")}
+        title="Aldıkların kontrol altında."
+        description="Harcadığını gör, belgelerini sakla, önemli tarihleri kaçırma."
+        action={<AddLink />}
+      />
+      <div className="summary-grid">
+        <div className="stat featured">
+          <div className="stat-label">
+            <Wallet size={19} /> Bu ayki harcaman
+          </div>
+          <strong>{formatCurrencyTRY(summary.thisMonth)}</strong>
+          <span>
+            Alışverişler ve kaydedilen ödemeler <ArrowUpRight size={16} />
+          </span>
+        </div>
+        <div className="stat">
+          <div className="stat-label">
+            <CreditCard size={19} /> Aylık abonelik yükü
+          </div>
+          <strong>{formatCurrencyTRY(summary.subscriptions)}</strong>
+          <span>
+            {
+              items.filter(
+                (i) => i.category === "subscription" && i.status === "active",
+              ).length
+            }{" "}
+            aktif abonelik
+          </span>
+        </div>
+        <div className="stat">
+          <div className="stat-label">
+            <ShieldCheck size={19} /> Devam eden garantiler
+          </div>
+          <strong>
+            {summary.warranties}
+            <small> ürün</small>
+          </strong>
+          <span>Garanti süresi devam edenler</span>
+        </div>
+        <div className="stat">
+          <div className="stat-label">
+            <FolderOpen size={19} /> Belge kasan
+          </div>
+          <strong>
+            {summary.documents}
+            <small> belge</small>
+          </strong>
+          <Link href="/app/documents">
+            Hepsi güvenle bir arada <ArrowUpRight size={16} />
+          </Link>
+        </div>
+      </div>
+      <div className="quick-section">
+        <div className="section-heading">
+          <h2>Bugün ne eklemek istersin?</h2>
+          <span>Bir dakikada düzenlemeye başla</span>
+        </div>
+        <div className="quick-grid">
+          {quick.map((q) => (
+            <Link
+              key={q.category}
+              href={`/app/items/new?category=${q.category}`}
+              className="quick-card"
+            >
+              <div className={`quick-icon ${q.category}`}>
+                <q.icon size={22} />
+              </div>
+              <div>
+                <strong>{q.title}</strong>
+                <span>{q.desc}</span>
+              </div>
+              <Plus size={19} />
+            </Link>
+          ))}
+        </div>
+      </div>
+      <div className="dashboard-columns">
+        <section className="panel">
+          <div className="panel-heading">
+            <h2>
+              <Bell size={19} /> Yaklaşan tarihler{" "}
+              <span className="count">{upcoming.length}</span>
+            </h2>
+            <Link href="/app/reminders">
+              Tümünü gör <ArrowRight size={15} />
+            </Link>
+          </div>
+          {overdue > 0 && (
+            <div className="inline-notice">
+              <AlertCircle size={16} />
+              {overdue} tarihin geçti. Kontrol ederek tamamlandı olarak
+              işaretleyebilirsin.
+            </div>
+          )}
+          {upcoming.length ? (
+            upcoming
+              .slice(0, 4)
+              .map((r) => <ReminderLine key={r.id} reminder={r} compact />)
+          ) : (
+            <Empty
+              title="Takviminde her şey yolunda."
+              description={
+                items.length
+                  ? "Yaklaşan bir tarih yok. Yeni tarih eklediğinde burada göreceksin."
+                  : "İlk kaydını ekle; önemli tarihleri senin için bir araya getirelim."
+              }
+              href={items.length ? undefined : "/app/items/new"}
+            />
+          )}
+        </section>
+        <section className="panel">
+          <div className="panel-heading">
+            <h2>
+              <Layers size={19} /> Son eklenenler
+            </h2>
+            <Link href="/app/items">
+              Tümünü gör <ArrowRight size={15} />
+            </Link>
+          </div>
+          {items.length ? (
+            items
+              .slice(0, 4)
+              .map((item) => <RecordRow key={item.id} item={item} />)
+          ) : (
+            <Empty
+              title="Yeni bir başlangıç."
+              description="Bir ürün, fatura veya abonelik ekleyerek kişisel arşivini oluşturmaya başla."
+            />
+          )}
+        </section>
+      </div>
+      <div className="tip-banner">
+        <div className="tip-icon">
+          <Sparkles size={23} />
+        </div>
+        <div>
+          <strong>Bir fotoğraf çek. Bir daha arama.</strong>
+          <p>
+            Fatura ve garanti belgelerini kaydına ekle, istediğin zaman PDF
+            olarak indir.
+          </p>
+        </div>
+        <Link href="/app/documents">
+          Belge kasasına git <ArrowRight size={17} />
+        </Link>
+      </div>
+    </>
+  );
 }
 export function ItemsPage() {
- const {items}=useAldimStore();const [query,setQuery]=useState('');const [category,setCategory]=useState('all');const [status,setStatus]=useState('active');
- const filtered=items.filter(i=>(category==='all'||i.category===category)&&(status==='all'||i.status===status)&&`${i.title} ${i.brand??''} ${i.store??''}`.toLocaleLowerCase('tr').includes(query.toLocaleLowerCase('tr')));
- return <><PageHeading eyebrow="KİŞİSEL ARŞİVİN" title="Kayıtlarım" description="Ürünlerin, araçların, faturaların ve aboneliklerin bir arada." action={<AddLink/>}/><div className="filters"><div className="search-field"><Search size={19}/><input aria-label="Kayıtlarda ara" placeholder="Ad, marka veya mağaza ara…" value={query} onChange={e=>setQuery(e.target.value)}/></div><select aria-label="Kategori" value={category} onChange={e=>setCategory(e.target.value)}><option value="all">Tüm kategoriler</option>{Object.values(CATEGORIES).map(c=><option key={c.category} value={c.category}>{c.label}</option>)}</select><select aria-label="Kayıt durumu" value={status} onChange={e=>setStatus(e.target.value)}><option value="active">Aktif kayıtlar</option><option value="archived">Arşivlenenler</option><option value="all">Hepsi</option></select></div><div className="panel"><div className="panel-heading"><h2>{filtered.length} kayıt</h2></div>{filtered.length?filtered.map(i=><RecordRow key={i.id} item={i}/>):<Empty title={items.length?'Sonuç bulunamadı.':'Henüz bir kayıt yok.'} description={items.length?'Arama veya filtreyi değiştirerek tekrar dene.':'İlk kaydını ekle, belgelerin ve tarihlerin düzenli kalsın.'} href={items.length?undefined:'/app/items/new'}/>}</div></>;
+  const { items } = useAldimStore();
+  const [query, setQuery] = useState("");
+  const [category, setCategory] = useState("all");
+  const [status, setStatus] = useState("active");
+  const filtered = items.filter(
+    (i) =>
+      (category === "all" || i.category === category) &&
+      (status === "all" || i.status === status) &&
+      `${i.title} ${i.brand ?? ""} ${i.store ?? ""}`
+        .toLocaleLowerCase("tr")
+        .includes(query.toLocaleLowerCase("tr")),
+  );
+  return (
+    <>
+      <PageHeading
+        eyebrow="KİŞİSEL ARŞİVİN"
+        title="Kayıtlarım"
+        description="Ürünlerin, araçların, faturaların ve aboneliklerin bir arada."
+        action={<AddLink />}
+      />
+      <div className="filters">
+        <div className="search-field">
+          <Search size={19} />
+          <input
+            aria-label="Kayıtlarda ara"
+            placeholder="Ad, marka veya mağaza ara…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </div>
+        <select
+          aria-label="Kategori"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+        >
+          <option value="all">Tüm kategoriler</option>
+          {Object.values(CATEGORIES).map((c) => (
+            <option key={c.category} value={c.category}>
+              {c.label}
+            </option>
+          ))}
+        </select>
+        <select
+          aria-label="Kayıt durumu"
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+        >
+          <option value="active">Aktif kayıtlar</option>
+          <option value="archived">Arşivlenenler</option>
+          <option value="all">Hepsi</option>
+        </select>
+      </div>
+      <div className="panel">
+        <div className="panel-heading">
+          <h2>{filtered.length} kayıt</h2>
+        </div>
+        {filtered.length ? (
+          filtered.map((i) => <RecordRow key={i.id} item={i} />)
+        ) : (
+          <Empty
+            title={items.length ? "Sonuç bulunamadı." : "Henüz bir kayıt yok."}
+            description={
+              items.length
+                ? "Arama veya filtreyi değiştirerek tekrar dene."
+                : "İlk kaydını ekle, belgelerin ve tarihlerin düzenli kalsın."
+            }
+            href={items.length ? undefined : "/app/items/new"}
+          />
+        )}
+      </div>
+    </>
+  );
 }
 export function RemindersPage() {
- const {reminders}=useAldimStore();const [filter,setFilter]=useState('upcoming');const list=reminders.filter(r=>filter==='completed'?r.status==='completed':r.status!=='completed'&&(filter==='overdue'?daysUntil(r.dueDate)<0:true)).sort((a,b)=>a.dueDate.localeCompare(b.dueDate));
- return <><PageHeading eyebrow="BİR ADIM ÖNDEN" title="Hatırlatmalar" description="Garanti, ödeme ve servis tarihleri. Aklında tutman gereken bir şey daha az."/><div className="filter-tabs">{[['upcoming','Bekleyenler'],['overdue','Tarihi geçenler'],['completed','Tamamlananlar']].map(([key,label])=><button key={key} className={filter===key?'selected':''} onClick={()=>setFilter(key)}>{label}</button>)}</div><div className="panel">{list.length?list.map(r=><ReminderLine key={r.id} reminder={r}/>):<Empty title="Burada bekleyen bir tarih yok." description="Kayıtlarına eklediğin önemli tarihler burada görünür." href="/app/items/new" label="Kayıt ekle"/>}</div></>;
+  const { reminders } = useAldimStore();
+  const [filter, setFilter] = useState("upcoming");
+  const list = reminders
+    .filter((r) =>
+      filter === "completed"
+        ? r.status === "completed"
+        : r.status !== "completed" &&
+          (filter === "overdue" ? daysUntil(r.dueDate) < 0 : true),
+    )
+    .sort((a, b) => a.dueDate.localeCompare(b.dueDate));
+  return (
+    <>
+      <PageHeading
+        eyebrow="BİR ADIM ÖNDEN"
+        title="Hatırlatmalar"
+        description="Garanti, ödeme ve servis tarihleri. Aklında tutman gereken bir şey daha az."
+      />
+      <div className="filter-tabs">
+        {[
+          ["upcoming", "Bekleyenler"],
+          ["overdue", "Tarihi geçenler"],
+          ["completed", "Tamamlananlar"],
+        ].map(([key, label]) => (
+          <button
+            key={key}
+            className={filter === key ? "selected" : ""}
+            onClick={() => setFilter(key)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+      <div className="panel">
+        {list.length ? (
+          list.map((r) => <ReminderLine key={r.id} reminder={r} />)
+        ) : (
+          <Empty
+            title="Burada bekleyen bir tarih yok."
+            description="Kayıtlarına eklediğin önemli tarihler burada görünür."
+            href="/app/items/new"
+            label="Kayıt ekle"
+          />
+        )}
+      </div>
+    </>
+  );
 }
-export function DocumentActions({doc}:{doc:AldimDocument}) {
- const {documentUrl,deleteDocument}=useAldimStore();const [working,setWorking]=useState(false);const [error,setError]=useState('');
- const run=async (action:()=>Promise<unknown>)=>{setWorking(true);setError('');try{await action();}catch(e){setError((e as Error).message);}finally{setWorking(false);}};
- return <><button className="icon-button" disabled={working||!doc.storagePath} aria-label={`${doc.name} PDF indir`} title="PDF indir" onClick={()=>void run(async()=>downloadDocument(await documentUrl(doc.storagePath!),doc))}><Download size={18}/></button><button className="icon-button" disabled={working} aria-label={`${doc.name} sil`} title="Belgeyi sil" onClick={()=>{if(confirm('Bu belgeyi kasandan kaldırmak istediğine emin misin?'))void run(()=>deleteDocument(doc));}}><Trash2 size={17}/></button>{error&&<span role="alert" className="error">{error}</span>}</>;
+export function DocumentActions({ doc }: { doc: AldimDocument }) {
+  const { documentUrl, deleteDocument } = useAldimStore();
+  const [working, setWorking] = useState(false);
+  const [error, setError] = useState("");
+  const run = async (action: () => Promise<unknown>) => {
+    setWorking(true);
+    setError("");
+    try {
+      await action();
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setWorking(false);
+    }
+  };
+  return (
+    <>
+      <button
+        className="icon-button"
+        disabled={working || !doc.storagePath}
+        aria-label={`${doc.name} PDF indir`}
+        title="PDF indir"
+        onClick={() =>
+          void run(async () =>
+            downloadDocument(await documentUrl(doc.storagePath!), doc),
+          )
+        }
+      >
+        <Download size={18} />
+      </button>
+      <button
+        className="icon-button"
+        disabled={working}
+        aria-label={`${doc.name} sil`}
+        title="Belgeyi sil"
+        onClick={() => {
+          if (confirm("Bu belgeyi kasandan kaldırmak istediğine emin misin?"))
+            void run(() => deleteDocument(doc));
+        }}
+      >
+        <Trash2 size={17} />
+      </button>
+      {error && (
+        <span role="alert" className="error">
+          {error}
+        </span>
+      )}
+    </>
+  );
 }
 export function DocumentsPage() {
- const {items}=useAldimStore();const [query,setQuery]=useState('');const [type,setType]=useState('all');const docs=items.flatMap(i=>i.documents).filter(d=>(type==='all'||d.type===type)&&`${d.name} ${d.itemTitle}`.toLocaleLowerCase('tr').includes(query.toLocaleLowerCase('tr')));
- return <><PageHeading eyebrow="KAYBOLMAYAN BELGELER" title="Belge kasası" description="Faturaların ve garanti belgelerin burada. İhtiyacın olduğunda PDF olarak indir." action={<Link className="primary" href="/app/items"><Plus size={18}/> Kayda belge ekle</Link>}/><div className="filters"><div className="search-field"><Search size={18}/><input aria-label="Belgelerde ara" placeholder="Belge veya kayıt adı ara…" value={query} onChange={e=>setQuery(e.target.value)}/></div><select aria-label="Belge türü" value={type} onChange={e=>setType(e.target.value)}><option value="all">Tüm belge türleri</option>{Object.entries(DOCUMENT_LABELS).map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></div><div className="panel">{docs.length?docs.map(doc=><div className="record-row" key={doc.id}><div className="item-icon"><FileText size={22}/></div><Link href={`/app/items/${doc.itemId}`} className="row-main"><strong>{doc.name}</strong><span>{doc.itemTitle} · {DOCUMENT_LABELS[doc.type]} · {formatDateTR(doc.date)}</span></Link><DocumentActions doc={doc}/></div>):<Empty title="Belgelerine güvenli bir yer." description="Bir kaydı açıp faturanın fotoğrafını çek veya PDF yükle. Tüm belgelerine buradan ulaşabilirsin." href="/app/items" label="Kayıtlarıma git"/>}</div></>;
+  const { items } = useAldimStore();
+  const [query, setQuery] = useState("");
+  const [type, setType] = useState("all");
+  const docs = items
+    .flatMap((i) => i.documents)
+    .filter(
+      (d) =>
+        (type === "all" || d.type === type) &&
+        `${d.name} ${d.itemTitle}`
+          .toLocaleLowerCase("tr")
+          .includes(query.toLocaleLowerCase("tr")),
+    );
+  return (
+    <>
+      <PageHeading
+        eyebrow="KAYBOLMAYAN BELGELER"
+        title="Belge kasası"
+        description="Faturaların ve garanti belgelerin burada. İhtiyacın olduğunda PDF olarak indir."
+        action={
+          <Link className="primary" href="/app/items">
+            <Plus size={18} /> Kayda belge ekle
+          </Link>
+        }
+      />
+      <div className="filters">
+        <div className="search-field">
+          <Search size={18} />
+          <input
+            aria-label="Belgelerde ara"
+            placeholder="Belge veya kayıt adı ara…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </div>
+        <select
+          aria-label="Belge türü"
+          value={type}
+          onChange={(e) => setType(e.target.value)}
+        >
+          <option value="all">Tüm belge türleri</option>
+          {Object.entries(DOCUMENT_LABELS).map(([value, label]) => (
+            <option key={value} value={value}>
+              {label}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="panel">
+        {docs.length ? (
+          docs.map((doc) => (
+            <div className="record-row" key={doc.id}>
+              <div className="item-icon">
+                <FileText size={22} />
+              </div>
+              <Link href={`/app/items/${doc.itemId}`} className="row-main">
+                <strong>{doc.name}</strong>
+                <span>
+                  {doc.itemTitle} · {DOCUMENT_LABELS[doc.type]} ·{" "}
+                  {formatDateTR(doc.date)}
+                </span>
+              </Link>
+              <DocumentActions doc={doc} />
+            </div>
+          ))
+        ) : (
+          <Empty
+            title="Belgelerine güvenli bir yer."
+            description="Bir kaydı açıp faturanın fotoğrafını çek veya PDF yükle. Tüm belgelerine buradan ulaşabilirsin."
+            href="/app/items"
+            label="Kayıtlarıma git"
+          />
+        )}
+      </div>
+    </>
+  );
 }
 export function SpendingPage() {
- const {items,payments}=useAldimStore();const [month,setMonth]=useState(new Date().toISOString().slice(0,7));const summary=spendingSummary(items,payments,month);
- const purchases=items.filter(i=>i.purchaseDate?.startsWith(month)&&!['home_bill','subscription'].includes(i.category));const rows=[...purchases.map(i=>({id:i.id,itemId:i.id,title:i.title,date:i.purchaseDate!,amount:i.price??0})),...payments.filter(p=>p.paidAt.startsWith(month)).map(p=>({id:p.id,itemId:p.itemId,title:p.itemTitle,date:p.paidAt,amount:p.amount}))].sort((a,b)=>b.date.localeCompare(a.date));
- return <><PageHeading eyebrow="PARANIN NEREYE GİTTİĞİNİ GÖR" title="Harcamalar" description="Satın aldıkların ve ödendi olarak işaretlediğin faturaların gerçek toplamı." action={<input type="month" aria-label="Harcama ayı" value={month} onChange={e=>setMonth(e.target.value)}/>}/><div className="summary-grid three"><div className="stat featured"><div className="stat-label">Seçili ayın harcaması</div><strong>{formatCurrencyTRY(summary.thisMonth)}</strong><span>{rows.length} işlem</span></div><div className="stat"><div className="stat-label">Aylık abonelik yükü</div><strong>{formatCurrencyTRY(summary.subscriptions)}</strong><span>Yıllık ve üç aylık planların aylık karşılığı dahil</span></div><div className="stat"><div className="stat-label">Toplam kayıtlı harcama</div><strong>{formatCurrencyTRY(summary.total)}</strong><span>Tüm dönemlerdeki alışveriş ve ödemeler</span></div></div><div className="panel"><div className="panel-heading"><h2>Harcama geçmişi</h2></div>{rows.length?rows.map(row=><Link href={`/app/items/${row.itemId}`} className="record-row" key={row.id}><div className="item-icon"><ArrowDownLeft size={21}/></div><div className="row-main"><strong>{row.title}</strong><span>{formatDateTR(row.date)}</span></div><strong>{formatCurrencyTRY(row.amount)}</strong></Link>):<Empty title="Bu ay için harcama bulunamadı." description="Tutarı ve satın alma tarihi olan ürünler ile kaydettiğin ödemeler burada görünür."/>}</div></>;
+  const { items, payments } = useAldimStore();
+  const [month, setMonth] = useState(new Date().toISOString().slice(0, 7));
+  const summary = spendingSummary(items, payments, month);
+  const purchases = items.filter(
+    (i) =>
+      i.purchaseDate?.startsWith(month) &&
+      !["home_bill", "subscription"].includes(i.category),
+  );
+  const rows = [
+    ...purchases.map((i) => ({
+      id: i.id,
+      itemId: i.id,
+      title: i.title,
+      date: i.purchaseDate!,
+      amount: i.price ?? 0,
+    })),
+    ...payments
+      .filter((p) => p.paidAt.startsWith(month))
+      .map((p) => ({
+        id: p.id,
+        itemId: p.itemId,
+        title: p.itemTitle,
+        date: p.paidAt,
+        amount: p.amount,
+      })),
+  ].sort((a, b) => b.date.localeCompare(a.date));
+  return (
+    <>
+      <PageHeading
+        eyebrow="PARANIN NEREYE GİTTİĞİNİ GÖR"
+        title="Harcamalar"
+        description="Satın aldıkların ve ödendi olarak işaretlediğin faturaların gerçek toplamı."
+        action={
+          <input
+            type="month"
+            aria-label="Harcama ayı"
+            value={month}
+            onChange={(e) => setMonth(e.target.value)}
+          />
+        }
+      />
+      <div className="summary-grid three">
+        <div className="stat featured">
+          <div className="stat-label">Seçili ayın harcaması</div>
+          <strong>{formatCurrencyTRY(summary.thisMonth)}</strong>
+          <span>{rows.length} işlem</span>
+        </div>
+        <div className="stat">
+          <div className="stat-label">Aylık abonelik yükü</div>
+          <strong>{formatCurrencyTRY(summary.subscriptions)}</strong>
+          <span>Yıllık ve üç aylık planların aylık karşılığı dahil</span>
+        </div>
+        <div className="stat">
+          <div className="stat-label">Toplam kayıtlı harcama</div>
+          <strong>{formatCurrencyTRY(summary.total)}</strong>
+          <span>Tüm dönemlerdeki alışveriş ve ödemeler</span>
+        </div>
+      </div>
+      <div className="panel">
+        <div className="panel-heading">
+          <h2>Harcama geçmişi</h2>
+        </div>
+        {rows.length ? (
+          rows.map((row) => (
+            <Link
+              href={`/app/items/${row.itemId}`}
+              className="record-row"
+              key={row.id}
+            >
+              <div className="item-icon">
+                <ArrowDownLeft size={21} />
+              </div>
+              <div className="row-main">
+                <strong>{row.title}</strong>
+                <span>{formatDateTR(row.date)}</span>
+              </div>
+              <strong>{formatCurrencyTRY(row.amount)}</strong>
+            </Link>
+          ))
+        ) : (
+          <Empty
+            title="Bu ay için harcama bulunamadı."
+            description="Tutarı ve satın alma tarihi olan ürünler ile kaydettiğin ödemeler burada görünür."
+          />
+        )}
+      </div>
+    </>
+  );
 }

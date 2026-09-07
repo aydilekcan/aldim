@@ -1,3 +1,9 @@
-import { AldimStoreProvider } from '@/lib/store';
-import { AppShell } from '@/components/app-shell';
-export default function AppLayout({children}: {children: React.ReactNode}) { return <AldimStoreProvider><AppShell>{children}</AppShell></AldimStoreProvider>; }
+import { AldimStoreProvider } from "@/lib/store";
+import { AppShell } from "@/components/app-shell";
+export default function AppLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <AldimStoreProvider>
+      <AppShell>{children}</AppShell>
+    </AldimStoreProvider>
+  );
+}
