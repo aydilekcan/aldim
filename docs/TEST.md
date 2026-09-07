@@ -2,6 +2,8 @@
 
 Web: https://aldim.vercel.app
 
+Son doğrulama: 7 Eylül 2026. Vercel production yayını READY; Supabase hatırlatma Cron görevi etkin. Kaynaklar GitHub `codex/unify-web-mobile` dalına gönderildi.
+
 1. Hesap oluştur veya giriş yap. Aynı hesapla mobil uygulamaya gir.
 2. Bir ürün ekle: fiyat 1.250,50 TL, satın alma tarihi, garanti bitişi.
 3. Fatura/garanti fotoğrafını yükle. Belge kasasından PDF indir. Diğer cihazda aynı belgenin açıldığını kontrol et.
@@ -20,4 +22,4 @@ SMS/e-posta sağlayıcıları henüz bağlı olmadığından bu iki kanaldan ger
 - iOS + Android Hermes üretim paketleri başarılı. iPhone 17 / iOS 26.5 simülatöründe gerçek hesap girişi, webdeki kayıtların görünmesi, fotoğrafın açılması ve 25 KB PDF oluşturularak iOS paylaşım ekranına ulaşılması doğrulandı.
 - Tarayıcı: giriş, ürün oluşturma, 1.250,50 TL tutar, fotoğraf yükleme, geçerli tek sayfa PDF indirme, masaüstü/390px telefon görünümü. Yatay taşma yok.
 - Bildirim fonksiyonu: yetkisiz çağrı 401; yetkili dry-run 200. Gerçek alıcılara test mesajı gönderilmedi.
-- Supabase test hesapları ve belgeleri teslimden önce temizlenir.
+- Oluşturulan 2 Supabase test hesabı ve 4 test dosyası temizlendi; gerçek kullanıcı kayıtları korunmuştur.
