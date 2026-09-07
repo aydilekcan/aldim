@@ -18,6 +18,8 @@ import { DateField, Field, TextField } from "./Field";
 import { CATEGORIES, type FieldSpec } from "../lib/categories";
 import { colors, fontSize, radius, spacing } from "../lib/theme";
 import type { ItemCategory, ItemFieldValue } from "../lib/types";
+import { formatMoneyInput } from "../../shared/money";
+import { todayIso } from "../../shared/date-utils";
 import { parseAmount } from "../../shared/domain";
 import { isNonEmptyString } from "../lib/utils";
 
@@ -81,7 +83,17 @@ export function ItemForm({
   showImagePicker = true,
 }: Props) {
   const spec = CATEGORIES[category];
-  const [v, setV] = useState<ItemFormValues>(initial);
+  const [v, setV] = useState<ItemFormValues>(() =>
+    Object.fromEntries(
+      Object.entries(initial).map(([key, value]) => [
+        key,
+        spec.fields.find((f) => f.key === key)?.type === "currency" &&
+        value !== ""
+          ? formatMoneyInput(Number(value))
+          : value,
+      ]),
+    ),
+  );
   const [invoiceImageUri, setInvoiceImageUri] = useState<string | null>(null);
   const [showDetails, setShowDetails] = useState(false);
 
@@ -124,6 +136,10 @@ export function ItemForm({
       }
     }
 
+    if (typeof v.purchaseDate === "string" && v.purchaseDate > todayIso()) {
+      Alert.alert("Geçersiz tarih", "Satın alma tarihi bugünden sonra olamaz.");
+      return;
+    }
     // Build top + fields
     const top: ItemFormSubmit["top"] = { title: "" };
     const fields: Record<string, ItemFieldValue> = {};
@@ -321,10 +337,21 @@ function FieldRenderer({
 
   if (spec.type === "date") {
     return (
-      <Field label={spec.label} hint={spec.hint}>
+      <Field
+        label={spec.label}
+        hint={spec.hint}
+        error={
+          spec.key === "purchaseDate" &&
+          typeof value === "string" &&
+          value > todayIso()
+            ? "Satın alma tarihi bugünden sonra olamaz."
+            : undefined
+        }
+      >
         <DateField
           value={typeof value === "string" ? value : undefined}
           onChange={(iso) => onChange(spec.key, iso)}
+          maximumDate={spec.key === "purchaseDate" ? new Date() : undefined}
         />
       </Field>
     );
@@ -365,7 +392,33 @@ function FieldRenderer({
     );
   }
 
-  // text, textarea, number, currency
+  if (spec.type === "currency")
+    return (
+      <Field label={spec.label} hint={spec.hint}>
+        <View style={{ position: "relative" }}>
+          <TextField
+            accessibilityLabel={spec.label}
+            value={formatMoneyInput(typeof value === "string" ? value : "")}
+            onChangeText={(text) => onChange(spec.key, formatMoneyInput(text))}
+            keyboardType="decimal-pad"
+            inputMode="decimal"
+            placeholder="0"
+            style={{ paddingRight: 38, fontVariant: ["tabular-nums"] }}
+          />
+          <Text
+            style={{
+              position: "absolute",
+              right: 16,
+              top: 15,
+              color: colors.ink[500],
+            }}
+          >
+            ₺
+          </Text>
+        </View>
+      </Field>
+    );
+  // text, textarea, number
   return (
     <Field label={spec.label} hint={spec.hint}>
       <TextField
@@ -379,16 +432,8 @@ function FieldRenderer({
             ? { minHeight: 80, textAlignVertical: "top" }
             : undefined
         }
-        keyboardType={
-          spec.type === "currency" || spec.type === "number"
-            ? "decimal-pad"
-            : "default"
-        }
-        inputMode={
-          spec.type === "currency" || spec.type === "number"
-            ? "decimal"
-            : "text"
-        }
+        keyboardType={spec.type === "number" ? "decimal-pad" : "default"}
+        inputMode={spec.type === "number" ? "decimal" : "text"}
         autoCapitalize={spec.key === "plate" ? "characters" : "sentences"}
       />
     </Field>

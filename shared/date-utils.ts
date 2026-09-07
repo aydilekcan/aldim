@@ -93,5 +93,5 @@ export function formatDateTR(iso?: string | null): string {
 }
 
 export function formatCurrencyTRY(value: number): string {
-  return `${value.toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺`;
+  return `${value.toLocaleString("tr-TR", { minimumFractionDigits: Number.isInteger(value) ? 0 : 2, maximumFractionDigits: 2 })} ₺`;
 }

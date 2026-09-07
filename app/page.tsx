@@ -30,12 +30,12 @@ export default function Landing() {
       <section className="hero">
         <div className="hero-copy">
           <div className="eyebrow">
-            <span className="green-dot" /> ALDIKTAN SONRA DA YANINDA
+            <span className="green-dot" /> FATURA · GARANTİ · HARCAMA
           </div>
           <h1>
             Aldın.
             <br />
-            Gerisini <span>rahat bırak.</span>
+            <span>Kaydını tut.</span>
           </h1>
           <p>
             Faturaların çekmecede kaybolmasın, garantin aklından çıkmasın.

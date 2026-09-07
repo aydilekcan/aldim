@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ArrowLeft, Check, ChevronDown, FileUp, Layers } from "lucide-react";
 import { CATEGORIES, type FieldSpec } from "@/shared/categories";
+import { CurrencyInput } from "./currency-input";
+import { todayIso } from "@/shared/date-utils";
 import { parseAmount } from "@/shared/domain";
 import type { AldimItem, ItemCategory, ItemFieldValue } from "@/shared/types";
 import { useAldimStore } from "@/lib/store";
@@ -155,10 +157,25 @@ export function ItemEditor({
                 onChange={(e) => set(e.target.value)}
                 rows={3}
               />
+            ) : spec.type === "currency" ? (
+              <CurrencyInput
+                value={typeof val === "number" ? val : String(val ?? "")}
+                onChange={set}
+                required={spec.required}
+              />
             ) : (
               <input
                 value={String(val ?? "")}
-                onChange={(e) => set(e.target.value)}
+                onChange={(e) => {
+                  set(e.target.value);
+                  if (spec.key === "purchaseDate")
+                    e.target.setCustomValidity(
+                      e.target.value > todayIso()
+                        ? "Satın alma tarihi bugünden sonra olamaz."
+                        : "",
+                    );
+                }}
+                max={spec.key === "purchaseDate" ? todayIso() : undefined}
                 type={
                   spec.type === "date"
                     ? "date"
@@ -166,16 +183,18 @@ export function ItemEditor({
                       ? "number"
                       : "text"
                 }
-                inputMode={spec.type === "currency" ? "decimal" : undefined}
                 required={spec.required}
-                placeholder={
-                  spec.placeholder ??
-                  (spec.type === "currency" ? "0,00" : undefined)
-                }
+                placeholder={spec.placeholder}
                 min={spec.type === "number" ? 0 : undefined}
               />
             )}{" "}
-            {spec.hint && <small>{spec.hint}</small>}
+            {spec.key === "purchaseDate" && String(val ?? "") > todayIso() ? (
+              <small className="field-error" role="alert">
+                Satın alma tarihi bugünden sonra olamaz.
+              </small>
+            ) : (
+              spec.hint && <small>{spec.hint}</small>
+            )}
           </>
         )}
       </label>
@@ -190,8 +209,7 @@ export function ItemEditor({
         <ArrowLeft size={17} /> {existing ? "Kayda dön" : "Kayıtlarıma dön"}
       </Link>
       <PageHeading
-        eyebrow={existing ? "HER ŞEY GÜNCEL KALSIN" : "BİRAZ DÜZENLE BAŞLA"}
-        title={existing ? "Kaydı düzenle" : "Ne eklemek istersin?"}
+        title={existing ? "Kaydı düzenle" : "Yeni kayıt"}
         description={
           category
             ? `${CATEGORIES[category].label} · Temel bilgileri gir; detayları dilediğin zaman ekleyebilirsin.`

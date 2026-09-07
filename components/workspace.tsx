@@ -14,7 +14,6 @@ import {
   Plus,
   Search,
   ShieldCheck,
-  Sparkles,
   Wallet,
   CreditCard,
   Car,
@@ -232,15 +231,13 @@ export function Dashboard() {
   return (
     <>
       <PageHeading
-        eyebrow={new Date()
-          .toLocaleDateString("tr-TR", {
-            day: "numeric",
-            month: "long",
-            weekday: "long",
-          })
-          .toLocaleUpperCase("tr")}
-        title="Aldıkların kontrol altında."
-        description="Harcadığını gör, belgelerini sakla, önemli tarihleri kaçırma."
+        eyebrow={new Date().toLocaleDateString("tr-TR", {
+          day: "numeric",
+          month: "long",
+          weekday: "long",
+        })}
+        title="Genel bakış"
+        description="Harcamaların ve sıradaki önemli tarihler."
         action={<AddLink />}
       />
       <div className="summary-grid">
@@ -286,14 +283,13 @@ export function Dashboard() {
             <small> belge</small>
           </strong>
           <Link href="/app/documents">
-            Hepsi güvenle bir arada <ArrowUpRight size={16} />
+            Belgeleri aç <ArrowUpRight size={16} />
           </Link>
         </div>
       </div>
       <div className="quick-section">
         <div className="section-heading">
-          <h2>Bugün ne eklemek istersin?</h2>
-          <span>Bir dakikada düzenlemeye başla</span>
+          <h2>Hızlı ekle</h2>
         </div>
         <div className="quick-grid">
           {quick.map((q) => (
@@ -338,7 +334,7 @@ export function Dashboard() {
               .map((r) => <ReminderLine key={r.id} reminder={r} compact />)
           ) : (
             <Empty
-              title="Takviminde her şey yolunda."
+              title="Yaklaşan bir tarih yok"
               description={
                 items.length
                   ? "Yaklaşan bir tarih yok. Yeni tarih eklediğinde burada göreceksin."
@@ -363,26 +359,11 @@ export function Dashboard() {
               .map((item) => <RecordRow key={item.id} item={item} />)
           ) : (
             <Empty
-              title="Yeni bir başlangıç."
+              title="Henüz kayıt yok"
               description="Bir ürün, fatura veya abonelik ekleyerek kişisel arşivini oluşturmaya başla."
             />
           )}
         </section>
-      </div>
-      <div className="tip-banner">
-        <div className="tip-icon">
-          <Sparkles size={23} />
-        </div>
-        <div>
-          <strong>Bir fotoğraf çek. Bir daha arama.</strong>
-          <p>
-            Fatura ve garanti belgelerini kaydına ekle, istediğin zaman PDF
-            olarak indir.
-          </p>
-        </div>
-        <Link href="/app/documents">
-          Belge kasasına git <ArrowRight size={17} />
-        </Link>
       </div>
     </>
   );

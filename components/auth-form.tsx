@@ -63,12 +63,12 @@ export function AuthForm() {
         aldım<span>•</span>
       </Link>
       <div className="auth-card">
-        <div className="eyebrow">DAHA AZ TAKİP, DAHA ÇOK RAHATLIK</div>
+        <div className="eyebrow">ALDIM HESABIN</div>
         <h1>
           {mode === "login"
             ? "Tekrar hoş geldin."
             : mode === "signup"
-              ? "Her şey yerli yerinde."
+              ? "Hesap oluştur."
               : "Şifreni yenile."}
         </h1>
         <p className="muted">

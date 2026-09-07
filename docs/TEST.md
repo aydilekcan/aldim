@@ -16,10 +16,18 @@ SMS/e-posta sağlayıcıları henüz bağlı olmadığından bu iki kanaldan ger
 
 ## Otomatik doğrulama
 
-- 15 test: tarih/para, garanti/servis hatırlatma üretimi, eski veri sahipliği, harcama/yenileme bozuk görsel güvenliği ve geçici oturum zamanlaması.
+- 18 test: tarih/para, garanti/servis hatırlatma üretimi, eski veri sahipliği, harcama/yenileme bozuk görsel güvenliği ve geçici oturum zamanlaması.
 - 11 canlı Supabase testi: iki hesapla oturum, kayıt/hatırlatma atomikliği, RLS, private dosya, eski sürüm çatışması, servis takibi, eşzamanlı ödemenin tekilleşmesi, silinen kaydın geri gelmemesi, tercihler ve iki aylık fatura.
 - Web ve mobil TypeScript, web lint ve Next.js üretim derlemesi başarılı.
 - iOS + Android Hermes üretim paketleri başarılı. iPhone 17 / iOS 26.5 simülatöründe gerçek hesap girişi, webdeki kayıtların görünmesi, fotoğrafın açılması ve 25 KB PDF oluşturularak iOS paylaşım ekranına ulaşılması doğrulandı.
 - Tarayıcı: giriş, ürün oluşturma, 1.250,50 TL tutar, fotoğraf yükleme, geçerli tek sayfa PDF indirme, masaüstü/390px telefon görünümü. Yatay taşma yok.
 - Bildirim fonksiyonu: yetkisiz çağrı 401; yetkili dry-run 200. Gerçek alıcılara test mesajı gönderilmedi.
 - Oluşturulan 2 Supabase test hesabı ve 4 test dosyası temizlendi; gerçek kullanıcı kayıtları korunmuştur.
+
+## Kullanıcı geri bildirimi — 7 Eylül
+
+- Web ve mobil tutar alanları binlik ayırıcı kullanır; 235000 → 235.000 ₺, kuruşlar korunur. Ortak testler sayı/form dönüşümünde tutarın değişmediğini kontrol eder.
+- Satın alma tarihi bugünü geçemez. Webde Türkçe alan uyarısı, mobilde tarih seçici sınırı ve ortak kayıt doğrulaması vardır. Supabase trigger kontrolü gelecekteki bir ekleme isteğiyle rollback içinde doğrulandı; mevcut kayıtlar değiştirilmedi.
+- İzole tarayıcıda sahte ağ yanıtlarıyla yazma, silme, kuruş ekleme, ondalıklı tutar yapıştırma, gelecek tarih uyarısı ve geçerli tarihle uyarının kalkması doğrulandı. Bu görsel test için gerçek kullanıcı verisi kullanılmadı.
+- Sıcak beyaz/koyu mürekkep/kiremit paleti, daha küçük hızlı işlemler, sade harcama özeti ve daha okunaklı form alanları web ve mobile uygulandı. 390 px görünümde yatay taşma yok.
+- Terminalde pnpm bulunmaması için scripts/expo-login.command eklendi. --check ile bu bilgisayarda Node 24.19.0 ve pnpm 11.19.0 doğrulandı; gerçek Expo girişi kullanıcı tarafından tamamlanmalı.

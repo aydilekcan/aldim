@@ -71,7 +71,7 @@ export default function HomeScreen() {
       >
         <View style={s.brandRow}>
           <Text style={s.brand}>
-            aldım<Text style={{ color: "#90AF65" }}>•</Text>
+            aldım<Text style={{ color: colors.brand[700] }}>•</Text>
           </Text>
           <Pressable
             accessibilityLabel="Ayarlar"
@@ -85,10 +85,16 @@ export default function HomeScreen() {
             />
           </Pressable>
         </View>
-        <Text style={s.eyebrow}>HER ŞEY KONTROL ALTINDA</Text>
-        <Text style={s.title}>Aldıkların elinin altında.</Text>
+        <Text style={s.eyebrow}>
+          {new Date().toLocaleDateString("tr-TR", {
+            day: "numeric",
+            month: "long",
+            weekday: "long",
+          })}
+        </Text>
+        <Text style={s.title}>Genel bakış</Text>
         <Text style={s.description}>
-          Harcadığını gör. Belgelerini sakla. Zamanında hatırla.
+          Harcamaların ve sıradaki önemli tarihler.
         </Text>
         {syncError && (
           <View style={s.error}>
@@ -104,7 +110,7 @@ export default function HomeScreen() {
         >
           <View style={s.brandRow}>
             <Text style={s.heroLabel}>Bu ayki harcaman</Text>
-            <Ionicons name="arrow-forward" size={21} color="#DCE8D3" />
+            <Ionicons name="arrow-forward" size={21} color={colors.ink[500]} />
           </View>
           <Text style={s.amount}>{formatCurrencyTRY(summary.thisMonth)}</Text>
           <Text style={s.heroHint}>
@@ -129,10 +135,10 @@ export default function HomeScreen() {
               color={colors.brand[700]}
             />
             <Text style={s.metricValue}>{summary.documents} belge</Text>
-            <Text style={s.metricLabel}>Güvenle bir arada</Text>
+            <Text style={s.metricLabel}>Belgeleri aç</Text>
           </Pressable>
         </View>
-        <Text style={s.section}>Bugün ne eklemek istersin?</Text>
+        <Text style={s.section}>Hızlı ekle</Text>
         <View style={s.grid}>
           {QUICK.map((q) => (
             <Pressable
@@ -140,14 +146,8 @@ export default function HomeScreen() {
               style={s.quick}
               onPress={() => router.push(`/item/new?category=${q.category}`)}
             >
-              <View style={s.quickTop}>
-                <View style={s.quickIcon}>
-                  <Ionicons name={q.icon} size={22} color={colors.brand[700]} />
-                </View>
-                <Ionicons name="add" size={19} color={colors.ink[400]} />
-              </View>
+              <Ionicons name={q.icon} size={20} color={colors.ink[500]} />
               <Text style={s.quickTitle}>{q.title}</Text>
-              <Text style={s.quickDescription}>{q.description}</Text>
             </Pressable>
           ))}
         </View>
@@ -165,7 +165,7 @@ export default function HomeScreen() {
           </View>
         ) : (
           <EmptyState
-            title="Takviminde her şey yolunda."
+            title="Yaklaşan bir tarih yok"
             description="Kayıtlarına eklediğin önemli tarihler burada görünür."
           />
         )}
@@ -184,15 +184,6 @@ export default function HomeScreen() {
             </View>
           </>
         )}
-        <View style={s.tip}>
-          <Ionicons name="camera-outline" size={25} color={colors.brand[700]} />
-          <View style={{ flex: 1 }}>
-            <Text style={s.quickTitle}>Bir fotoğraf çek. Bir daha arama.</Text>
-            <Text style={s.quickDescription}>
-              Faturanı kaydına ekle, istediğin zaman PDF indir.
-            </Text>
-          </View>
-        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -218,11 +209,11 @@ const s = StyleSheet.create({
   },
   settings: { backgroundColor: colors.white, padding: 11, borderRadius: 12 },
   eyebrow: {
-    fontSize: 9,
-    letterSpacing: 1.8,
-    color: colors.brand[700],
-    fontWeight: "700",
-    marginTop: 28,
+    fontSize: 13,
+    letterSpacing: 0,
+    color: colors.ink[500],
+    fontWeight: "400",
+    marginTop: 24,
     marginBottom: 12,
   },
   title: {
@@ -238,24 +229,28 @@ const s = StyleSheet.create({
     marginTop: 9,
     marginBottom: 24,
   },
-  hero: { backgroundColor: "#285E4E", borderRadius: 19, padding: 23 },
-  heroLabel: { fontSize: 13, color: "#DCE8D3" },
+  hero: {
+    borderTopWidth: 2,
+    borderBottomWidth: 1,
+    borderColor: colors.ink[200],
+    borderTopColor: colors.ink[900],
+    paddingVertical: 22,
+  },
+  heroLabel: { fontSize: 14, color: colors.ink[600] },
   amount: {
-    color: colors.white,
-    fontWeight: "700",
-    fontSize: 34,
+    color: colors.ink[900],
+    fontWeight: "600",
+    fontSize: 38,
     marginTop: 16,
     letterSpacing: -1,
   },
-  heroHint: { fontSize: 11, color: "#AEC7B4", marginTop: 10 },
+  heroHint: { fontSize: 12, color: colors.ink[500], marginTop: 10 },
   metrics: { flexDirection: "row", gap: 12, marginTop: 12 },
   metric: {
     flex: 1,
-    backgroundColor: colors.white,
-    borderWidth: 1,
+    borderBottomWidth: 1,
     borderColor: colors.ink[200],
-    borderRadius: 15,
-    padding: 17,
+    paddingVertical: 14,
   },
   metricValue: {
     fontSize: 20,
@@ -284,8 +279,11 @@ const s = StyleSheet.create({
     backgroundColor: colors.white,
     borderWidth: 1,
     borderColor: colors.ink[200],
-    borderRadius: 15,
-    padding: 16,
+    borderRadius: 6,
+    padding: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
   },
   quickTop: {
     flexDirection: "row",

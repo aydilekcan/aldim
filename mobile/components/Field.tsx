@@ -49,14 +49,18 @@ export function DateField({
   onChange,
   placeholder = "Tarih seç",
   minimumDate,
+  maximumDate,
 }: {
   value?: string; // YYYY-MM-DD
   onChange: (iso: string) => void;
   placeholder?: string;
   minimumDate?: Date;
+  maximumDate?: Date;
 }) {
   const [open, setOpen] = useState(false);
-  const current = value ? parseLocal(value) : new Date();
+  const selected = value ? parseLocal(value) : new Date();
+  const current =
+    maximumDate && selected > maximumDate ? maximumDate : selected;
 
   const handleChange = (_: unknown, picked?: Date) => {
     if (Platform.OS !== "ios") setOpen(false);
@@ -89,6 +93,7 @@ export function DateField({
             mode="date"
             display={Platform.OS === "ios" ? "spinner" : "default"}
             minimumDate={minimumDate}
+            maximumDate={maximumDate}
             onChange={handleChange}
             locale="tr-TR"
           />

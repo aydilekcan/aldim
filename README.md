@@ -89,7 +89,7 @@ Cron çağrısı `x-cron-secret` başlığıyla doğrulanır. Sır Supabase Vaul
 
 ```sh
 cd mobile
-pnpm dlx eas-cli login
+bash ../scripts/expo-login.command
 pnpm dlx eas-cli build --platform android --profile preview
 pnpm dlx eas-cli build --platform ios --profile development-simulator
 # Mağaza paketleri: eas build --platform all --profile production
@@ -100,3 +100,5 @@ Bu çalışma sırasında EAS hesabı oturumu olmadığı için imzalı APK/IPA 
 ## Bağımlılık güvenliği
 
 Next.js 15.5.21, Supabase 2.106.2 ve ilgili PostCSS/sharp/UUID/URL çözümleme düzeltmeleri uygulanmıştır. Metro'nun `image-size@1.2.1` bağımlılığı için iki bozuk görsel döngüsüne uzunluk sınırı yaması `patches/` altında tutulur ve pnpm tarafından otomatik uygulanır. Sürüm tabanlı `pnpm audit` bu iki uyarıyı göstermeye devam edebilir; yama davranışı `tests/image-safety.test.ts` ile ayrı süreç ve zaman aşımı kullanılarak doğrulanır. Yayımlanmış uyumlu upstream düzeltme geldiğinde yama kaldırılıp sürüm yükseltilmelidir.
+
+Terminalde `pnpm: command not found` görülürse proje kökünden `bash scripts/expo-login.command` çalıştırın. Komut bilgisayardaki mevcut Node/pnpm ortamını bulur; shell ayarlarınızı değiştirmez. Giriş bilgilerinizi yalnızca Expo'nun terminal istemine girin.

@@ -22,9 +22,9 @@ interface Props extends Omit<PressableProps, "style"> {
 
 const VARIANT_STYLE = {
   primary: {
-    bg: colors.brand[700],
+    bg: colors.ink[900],
     text: colors.white,
-    border: colors.brand[700],
+    border: colors.ink[900],
   },
   secondary: {
     bg: colors.accent[500],

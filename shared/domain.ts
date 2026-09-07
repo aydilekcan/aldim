@@ -27,13 +27,15 @@ export const isDate = (value: string): boolean =>
   new Date(value).toISOString().slice(0, 10) === value;
 export function parseAmount(value: string): number {
   const normalized = value.trim().replace(/\s/g, "").replace(/₺/g, "");
+  const turkish = /^\d{1,3}(?:\.\d{3})+(?:,\d{1,2})?$/.test(normalized);
+  const valid = turkish || /^\d+(?:[.,]\d{1,2})?$/.test(normalized);
   const number = Number(
-    normalized.includes(",")
+    turkish || normalized.includes(",")
       ? normalized.replace(/\./g, "").replace(",", ".")
       : normalized,
   );
-  if (!normalized || !Number.isFinite(number) || number < 0)
-    throw new Error("Geçerli, pozitif bir tutar gir. Örnek: 1.250,50");
+  if (!valid || !Number.isFinite(number) || number < 0)
+    throw new Error("Geçerli bir tutar gir. Örnek: 235.000,50");
   return Math.round(number * 100) / 100;
 }
 export function validateItem(
@@ -49,6 +51,12 @@ export function validateItem(
     (!Number.isFinite(item.price) || item.price < 0)
   )
     throw new Error("Tutar sıfır veya daha büyük olmalı.");
+  if (
+    item.purchaseDate &&
+    isDate(item.purchaseDate) &&
+    item.purchaseDate > todayIso()
+  )
+    throw new Error("Satın alma tarihi bugünden sonra olamaz.");
   for (const f of CATEGORIES[item.category].fields) {
     const value =
       f.key === "purchaseDate" ? item.purchaseDate : item.fields[f.key];

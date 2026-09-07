@@ -9,7 +9,6 @@ import {
   Settings,
   Plus,
   RefreshCw,
-  ShieldCheck,
   Wallet,
 } from "lucide-react";
 import { useAldimStore } from "@/lib/store";
@@ -36,7 +35,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <Link className="wordmark" href="/app">
           aldım<span>•</span>
         </Link>
-        <div className="sidebar-caption">HER ŞEY KONTROL ALTINDA</div>
+        <div className="sidebar-caption">Kişisel kayıt defterin</div>
         <nav aria-label="Ana menü">
           {links.map(({ href, label, icon: Icon }) => (
             <Link
@@ -54,15 +53,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <Plus size={19} /> Yeni kayıt
         </Link>
         <div className="sidebar-bottom">
-          <div className="private-card">
-            <ShieldCheck size={23} />
-            <strong>Sana özel bir alan.</strong>
-            <p>
-              Belgelerin güvenle saklanır,
-              <br />
-              ihtiyacın olduğunda yanındadır.
-            </p>
-          </div>
           <Link className="nav-link" href="/app/settings">
             <Settings size={19} /> Ayarlar
           </Link>
@@ -70,9 +60,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </aside>
       <div className="main-wrap">
         <header className="topbar">
-          <span className="topbar-brand">
-            Küçük bir düzen, büyük bir rahatlık.
-          </span>
+          <span className="topbar-brand">Fatura, garanti ve ödeme takibi</span>
           <div className="topbar-actions">
             <button
               className="icon-button"
@@ -112,7 +100,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           )}
         </main>
         <footer className="app-footer">
-          Aldım ile her şey elinin altında.
+          Aldım
           <span>Faturan · Garantin · Hatırlatman</span>
         </footer>
       </div>

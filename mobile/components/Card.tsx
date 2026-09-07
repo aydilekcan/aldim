@@ -35,10 +35,10 @@ const styles = StyleSheet.create({
     borderColor: colors.ink[100],
     padding: spacing.lg,
     shadowColor: colors.ink[900],
-    shadowOpacity: 0.04,
+    shadowOpacity: 0,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 2 },
-    elevation: 1,
+    elevation: 0,
   },
   title: {
     fontSize: fontSize.md,
