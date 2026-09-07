@@ -1,137 +1,102 @@
 # Aldım
 
-**Faturan, garantin, iaden tek yerde.**
+Faturalarını, garanti belgelerini, harcamalarını ve önemli tarihlerini tek hesapta saklayan web, iOS ve Android uygulaması.
 
-Aldım, satın aldığın ürünlerin faturalarını, garanti sürelerini, iade haklarını ve servis kayıtlarını tek yerden takip etmeni sağlayan, mobil öncelikli bir alışveriş sonrası asistanıdır.
+## Tek proje
 
-🔗 **Canlı demo:** https://aldim.vercel.app
+- `app/`, `components/`, `lib/`: Next.js web uygulaması.
+- `mobile/`: Expo / React Native iOS ve Android uygulaması.
+- `shared/`: ortak kategori formları, veri tipleri, tarih ve harcama hesapları, Supabase işlemleri ve eski veriyi içeri aktarma.
+- `supabase/migrations/`: canlı veritabanına uygulanmış, sıralı geçişler.
+- `supabase/functions/reminder-dispatch/`: push, e-posta ve SMS dağıtıcısı.
+- `tests/`: iş kuralları ve iki hesapla canlı entegrasyon kontrolleri.
 
-> Bu repoda, MVP'nin _ilk kullanıcılarla denenebilecek_ canlı versiyonu yer alır. Veriler şu an tarayıcı tarafında (localStorage) saklanır; gerçek auth, dosya yükleme ve bulut sync sonraki fazda eklenecektir.
+Eski bağımsız mobil klasör, veri kaybı olmadan `backups/aldim-mobile-original` altına taşınmıştır. Başlangıç kaynak kodu arşivi de `backups/` içindedir. Yedekler Git, Vercel, TypeScript ve Metro kapsamı dışındadır; aktif kaynak `mobile/` klasörüdür.
 
----
+Web ve mobil aynı Supabase projesini kullanır. Eski tarayıcı verileri Ayarlar'dan içeri alınabilir. Eski mobil kayıtlar yalnızca ait oldukları kullanıcı için aktarılır; özgün yerel veri silinmez. Bulut, kayıtların tek yetkili kaynağıdır. Mobil çevrimdışıyken son indirilen kayıtları gösterir; yeni kayıt/değişiklik için bağlantı gerekir.
 
-## Kullanılan teknolojiler
+## Çalıştırma
 
-- **Next.js 14** (App Router) + **React 18**
-- **TypeScript** (strict)
-- **Tailwind CSS** — özel marka renk paleti
-- **lucide-react** — ikonlar
-- **clsx + tailwind-merge** — koşullu className birleştirme
-- **PWA**: web manifest + apple-touch-icon (Home Screen'e eklenebilir)
-- **State**: React Context + reducer benzeri action'lar, **localStorage** persist
+Node.js 22 veya üzeri ve Corepack / pnpm 11.19.0 kullanın.
 
-Bağımlılıklar minimum tutulmuştur — UI primitive'leri (button, card, badge, input, label, select, textarea) sıfır kütüphane ile, shadcn benzeri kendi component'lerimiz olarak yazılmıştır.
-
----
-
-## Hızlı başlangıç
-
-```bash
-npm install
-npm run dev
-# → http://localhost:3000
+```sh
+corepack pnpm install --frozen-lockfile
+cp .env.example .env.local
+cp mobile/.env.example mobile/.env.local
+# İki dosyaya aynı Supabase URL ve public/publishable anahtarını girin.
+pnpm dev
+pnpm ios
+pnpm android
 ```
 
-> **npm cache izin sorunu** alırsan: `npm install --cache /tmp/npm-cache-aldim`
+Web: `http://localhost:3000`. Native: Expo Go ile ekran kontrolü; gerçek push bildirimi için Expo development/production build gerekir. `service_role`, Resend ve Twilio sırları web veya mobil dosyalara konmaz.
 
-İlk açılışta 4 demo ürünle gelir. Eklediğin/sildiğin ürünler localStorage'da kalır; **Ayarlar → Demo verisine sıfırla** ile her zaman geri dönebilirsin.
+## Kontroller
 
----
-
-## Production build
-
-```bash
-npm run build      # tip kontrol + lint + statik üretim
-npm run start      # production server (varsayılan 3000 portu)
+```sh
+pnpm check
+pnpm mobile:check
+pnpm build
+cd mobile
+pnpm exec expo export --platform ios --platform android --output-dir dist-native --max-workers 2
 ```
 
-Build sonrası tüm rotalar statik (`○`) veya dinamik (`ƒ`) olarak prerender edilir; ek bir sunucu ya da DB gerekmez.
+`tests/integration.ts` canlı sisteme test kayıtları yazar. Yalnızca iki ayrı, silinebilir test hesabıyla çalıştırın; fixture JSON biçimi `[{"id":"uuid","email":"...","password":"..."}, ...]` şeklindedir. Fixture ve anahtarları Git'e eklemeyin. Testten sonra oluşturulan dosyalar ve hesaplar temizlenmelidir.
 
----
-
-## Vercel deploy
-
-1. Bu repo'yu GitHub'a push et.
-2. [vercel.com/new](https://vercel.com/new) → "Import Git Repository" ile repo'yu seç.
-3. **Framework: Next.js** otomatik seçilir; ek konfig gerekmez.
-4. **Environment Variables**: MVP için boş bırakabilirsin. Sonraki faz için `.env.example` dosyasını referans al.
-5. "Deploy" — birkaç dakika içinde `https://<proje>.vercel.app` linkini alırsın.
-
-> Vercel Edge / Serverless çağrılarında zaman dilimi **UTC**'dir. Aldım tüm tarih hesaplarını client'ta (`lib/date-utils.ts`) lokal-safe biçimde yapar; SSR sırasında tarih bağımlı içerikler hidrate olana kadar skeleton gösterilir, böylece hidrasyon mismatch oluşmaz.
-
----
-
-## MVP kapsamı
-
-- ✅ Landing page (hero, problem, özellikler, akış, güven, CTA)
-- ✅ Dashboard — özet metrikler, acil uyarılar, riske göre sıralı ürün listesi
-- ✅ Ürün CRUD — ekle, listele, ara, filtrele, detay, sil, not düzenle
-- ✅ Ürün detayı — "Şimdi ne yapmalıyım?" banner, garanti/iade/servis özetleri
-- ✅ Belge kasası — tip filtresi + arama
-- ✅ İade süreçleri — yaklaşan / devam eden / tamamlanan
-- ✅ Servis kayıtları — durum + sonraki takip tarihi
-- ✅ Hazır iade mesajı — kopyala butonu
-- ✅ Ayarlar — uyarı eşikleri, JSON dışa aktar, demo verisine sıfırla
-- ✅ Mobil bottom navigation + iOS safe-area
-- ✅ Toast bildirimleri (ekle / sil / kopyala / kaydet)
-- ✅ PWA — manifest + apple-touch-icon, Home Screen'e eklenebilir
-
-## Şu an mock/demo olan özellikler
-
-| Alan | Durum | Not |
-|---|---|---|
-| Dosya yükleme (fatura, garanti, servis formu) | Mock | UI hazır; "Demo" rozetiyle işaretli. Belge adı + tipi kaydedilir. |
-| Authentication | Yok | Tek "demo kullanıcı". Veri tarayıcıda. |
-| Bulut sync | Yok | LocalStorage. Tarayıcı temizlenirse demo'ya geri döner. |
-| Push / e-posta bildirimleri | Yok | Uyarılar yalnızca dashboard'da görseldir. |
-| Banka / e-Devlet / kargo API'leri | Yok | Belirtilmiş alanlar serbest metin. |
-| Karanlık tema | Placeholder | Ayarlar ekranında disabled. |
-
-## Sonraki faz önerileri
-
-1. **Supabase auth + cloud sync** — `lib/store.tsx` action'larını Supabase'e bağla; localStorage offline cache olarak kalsın.
-2. **Gerçek dosya yükleme** — Supabase Storage veya Cloudflare R2. Mevcut belge formu kalır, yalnızca `addDocument` action'ı dosya upload adımı kazanır.
-3. **E-posta hatırlatma** — Resend + Vercel Cron, "garanti / iade süresi yaklaşıyor" uyarıları.
-4. **OCR ile fatura tarama** — Mistral OCR / Google Document AI ile fotoğraftan ürün adı, tarih, fiyat çıkarımı.
-5. **Pazaryeri webhook'ları** — Trendyol / Hepsiburada siparişlerinin otomatik ürün olarak eklenmesi.
-6. **Aile / paylaşılan arşiv** — `ownerId` + paylaşım grupları.
-7. **Karanlık tema** — `class="dark"` ve Tailwind dark variant'ları.
-
----
-
-## Proje yapısı
-
-```
-aldim/
-├── app/
-│   ├── layout.tsx, page.tsx (landing), globals.css, manifest.ts
-│   └── app/
-│       ├── layout.tsx (ToastProvider + AldimStoreProvider + AppShell)
-│       ├── page.tsx (dashboard)
-│       ├── products/ (page, new, [id])
-│       ├── documents/page.tsx
-│       ├── returns/page.tsx
-│       └── settings/page.tsx
-├── components/
-│   ├── ui/ (button, card, badge, input, label, select, textarea)
-│   ├── app-shell.tsx (sidebar + mobil topbar + bottom nav)
-│   └── product-card, stat-card, empty-state, status-badge, alert-banner, ...
-├── lib/
-│   ├── types.ts            # TS interfaces
-│   ├── mock-data.ts        # ilk demo ürünleri + öneri listeleri
-│   ├── store.tsx           # Context + localStorage + sanitize
-│   ├── toast.tsx           # Toast Context + Toaster
-│   ├── date-utils.ts       # local-safe tarih hesapları
-│   ├── status.ts           # durum/risk/ton hesapları + labels
-│   ├── templates.ts        # satıcı mesajı + yasal uyarı
-│   └── utils.ts            # cn, format helper'ları
-└── public/
-    ├── manifest.webmanifest (Next manifest.ts'ten üretilir)
-    ├── favicon.svg, apple-touch-icon.svg, icon-192.svg, icon-512.svg
+```sh
+ALDIM_TEST_USERS_FILE=/secure/path/test-users.json node --env-file=.env.local --import tsx tests/integration.ts
 ```
 
----
+## Kapsam
 
-## Yasal not
+Ürün, araç, fatura, sigorta, abonelik ve servis kategorileri; dinamik kayıt formları; garanti / ödeme / yenileme / servis takip tarihleri; belge fotoğrafı veya PDF yükleme; görseli PDF'e çevirerek indirme/paylaşma; servis geçmişi; arama ve filtreler; harcama özeti; ödemeyi işaretleme; aylık, iki aylık, üç aylık ve yıllık yenilemeler.
 
-Aldım hukuki danışmanlık vermez. Belgelerini düzenlemene, tarihleri takip etmene ve süreçlerini kayıt altında tutmana yardımcı olur.
+Belge kasası private Supabase Storage kullanır. İndirme bağlantıları 5 dakika geçerlidir. JPG, PNG, WebP ve PDF kabul edilir; sınır 6 MB'dır. Silinen kayıt ve belge metadata'sı tombstone olarak tutulur; private dosya kurtarma için saklanır. Otomatik kalıcı dosya temizliği etkin değildir.
+
+Kullanıcı izolasyonu RLS ile veritabanında uygulanır. Kayıt + hatırlatma kaydı atomiktir. Eski cihazın güncellemesi daha yeni kaydı sessizce ezemez. Aynı ödeme eşzamanlı iki kez işaretlense bile tek ödeme oluşur.
+
+## Yayın
+
+Mevcut Vercel projesi: `aldim`, web adresi: https://aldim.vercel.app. Proje kökü bu klasördür; `mobile/` olarak değiştirilmez. `vercel.json` workspace kurulumunu tanımlar. Vercel'de `NEXT_PUBLIC_SUPABASE_URL` ve `NEXT_PUBLIC_SUPABASE_ANON_KEY` bulunmalıdır.
+
+Supabase Auth → URL Configuration:
+
+- Site URL: `https://aldim.vercel.app`
+- Redirect URL: `https://aldim.vercel.app/app`
+- Redirect URL: `https://aldim.vercel.app/auth/reset`
+- Yerel test gerektiğinde `http://localhost:3000/**` ve `http://127.0.0.1:3000/**` ekleyin.
+
+Hesap doğrulama ve şifre yenileme e-postaları Supabase Auth üzerinden gider. Üretim e-posta hacmi için Supabase SMTP yapılandırması ayrıca gereklidir.
+
+## Hatırlatma kanalları
+
+Supabase Cron, Türkiye saatiyle 10:00–21:00 arasında saatlik çalışır. Aynı hatırlatma/tarih/kanal/hedef için tekrarlı gönderim engellenir. Kabul, teslim ve hata durumları ayrı tutulur; belirsiz sağlayıcı yanıtları körlemesine yeniden gönderilmez. Uygulama bildirimi için son 30 gün içinde etkin cihaz kaydı tercih edilir. Cihazı olmayan kullanıcıda açık tercihine göre e-posta ve SMS denenir.
+
+Push için Expo projesi `f5bfa130-617b-4542-b5be-1b45a6f46ac5` kullanılır. Apple APNs / Android FCM kimlikleri EAS üzerinde hazırlanmalıdır. Expo Go, üretim push testinin yerine geçmez.
+
+E-posta ve SMS sağlayıcıları bağlı değildir. Etkinleştirmek için Supabase Edge Function secrets alanına şu değerleri ekleyin:
+
+- E-posta: `RESEND_API_KEY`, `REMINDER_FROM_EMAIL` (doğrulanmış gönderici).
+- SMS: `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER`.
+
+Dağıtıcının sonraki çalışması kanal durumunu günceller. SMS telefonu uluslararası `+905xxxxxxxxx` biçiminde girilir. Gönderim tercihleri kullanıcı tarafından değiştirilebilir.
+
+Cron çağrısı `x-cron-secret` başlığıyla doğrulanır. Sır Supabase Vault'ta `aldim_reminder_cron` adıyla tutulur; kaynak kod yalnızca SHA-256 özetini içerir. Yeni ortama kurarken güçlü yeni sır oluşturun, özeti `config.ts` içinde güncelleyin, Vault'a sırrı kaydedin ve fonksiyonu tekrar yayınlayın. `supabase/scheduler.sql` zamanlayıcı tanımıdır. Canlı ortama migration'ları ikinci kez uygulamayın.
+
+## iOS / Android dağıtımı
+
+`mobile/eas.json` development, simulator, preview APK ve production profillerini içerir. Mevcut Expo hesabına giriş yapıldıktan sonra:
+
+```sh
+cd mobile
+pnpm dlx eas-cli login
+pnpm dlx eas-cli build --platform android --profile preview
+pnpm dlx eas-cli build --platform ios --profile development-simulator
+# Mağaza paketleri: eas build --platform all --profile production
+```
+
+Bu çalışma sırasında EAS hesabı oturumu olmadığı için imzalı APK/IPA veya mağaza gönderimi yapılmadı. iOS/Android JavaScript paketlerinin başarıyla derlenmesi, fiziksel cihazda push ve kamera testinin yerine geçmez.
+
+## Bağımlılık güvenliği
+
+Next.js 15.5.21, Supabase 2.106.2 ve ilgili PostCSS/sharp/UUID/URL çözümleme düzeltmeleri uygulanmıştır. Metro'nun `image-size@1.2.1` bağımlılığı için iki bozuk görsel döngüsüne uzunluk sınırı yaması `patches/` altında tutulur ve pnpm tarafından otomatik uygulanır. Sürüm tabanlı `pnpm audit` bu iki uyarıyı göstermeye devam edebilir; yama davranışı `tests/image-safety.test.ts` ile ayrı süreç ve zaman aşımı kullanılarak doğrulanır. Yayımlanmış uyumlu upstream düzeltme geldiğinde yama kaldırılıp sürüm yükseltilmelidir.

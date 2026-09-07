@@ -33,3 +33,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+node_modules/
+mobile/.expo/
+mobile/dist/
+mobile/build/
+backups/
+.env.local
+
+.pnpm-store/
+mobile/dist-native/
+
+supabase/.temp/

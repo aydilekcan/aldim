@@ -1,0 +1,84 @@
+{
+  "expo": {
+    "name": "Aldım",
+    "slug": "aldim-mobile",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "aldim",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.aldim.app",
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "Fatura ve belgelerini eklemek için galerine erişim izni gerekir.",
+        "NSCameraUsageDescription": "Fatura ve belgelerini eklemek için kameraya erişim izni gerekir.",
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "com.aldim.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#246F5E",
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "backgroundImage": "./assets/images/android-icon-background.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.CAMERA"
+      ],
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
+    },
+    "web": {
+      "output": "single",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#246F5E",
+          "dark": {
+            "backgroundColor": "#173E35"
+          }
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#246F5E"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Fatura ve belgelerini eklemek için galerine erişim izni gerekir.",
+          "cameraPermission": "Belge fotoğrafı çekmek için kameraya erişim izni gerekir.",
+          "microphonePermission": false
+        }
+      ],
+      "@react-native-community/datetimepicker"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "f5bfa130-617b-4542-b5be-1b45a6f46ac5"
+      }
+    },
+    "owner": "aydilekcan"
+  }
+}
