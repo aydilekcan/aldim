@@ -13,9 +13,10 @@ if [ "${1:-}" = "--check" ]; then
   exit 0
 fi
 if command -v pnpm >/dev/null 2>&1; then
-  pnpm dlx eas-cli login
+  # Login does not need dependency install scripts or native tracing builds.
+  pnpm --config.ignore-scripts=true dlx eas-cli login
 elif command -v npx >/dev/null 2>&1; then
-  npx --yes eas-cli login
+  npx --yes --ignore-scripts eas-cli login
 else
   echo 'Node.js bulunamadı. nodejs.org adresinden LTS sürümünü kurup tekrar aç.'
   read -r -p 'Kapatmak için Enter…'
