@@ -95,10 +95,14 @@ pnpm dlx eas-cli build --platform ios --profile development-simulator
 # Mağaza paketleri: eas build --platform all --profile production
 ```
 
-Bu çalışma sırasında EAS hesabı oturumu olmadığı için imzalı APK/IPA veya mağaza gönderimi yapılmadı. iOS/Android JavaScript paketlerinin başarıyla derlenmesi, fiziksel cihazda push ve kamera testinin yerine geçmez.
+EAS hesabı bağlıdır; imzalı APK/IPA veya mağaza gönderimi henüz yapılmadı. iOS/Android JavaScript paketlerinin başarıyla derlenmesi, fiziksel cihazda push ve kamera testinin yerine geçmez.
 
 ## Bağımlılık güvenliği
 
-Next.js 15.5.21, Supabase 2.106.2 ve ilgili PostCSS/sharp/UUID/URL çözümleme düzeltmeleri uygulanmıştır. Metro'nun `image-size@1.2.1` bağımlılığı için iki bozuk görsel döngüsüne uzunluk sınırı yaması `patches/` altında tutulur ve pnpm tarafından otomatik uygulanır. Sürüm tabanlı `pnpm audit` bu iki uyarıyı göstermeye devam edebilir; yama davranışı `tests/image-safety.test.ts` ile ayrı süreç ve zaman aşımı kullanılarak doğrulanır. Yayımlanmış uyumlu upstream düzeltme geldiğinde yama kaldırılıp sürüm yükseltilmelidir.
+Next.js 15.5.21, Supabase 2.106.2 ve ilgili PostCSS/sharp/UUID/URL çözümleme düzeltmeleri uygulanmıştır. Mobil SDK 57 yükseltmesiyle eski Metro ve `image-size@1.2.1` bağımlılığı kaldırıldı; artık kullanılmayan yerel yama ve ona özgü iki test de temizlendi.
 
-Terminalde `pnpm: command not found` görülürse proje kökünden `bash scripts/expo-login.command` çalıştırın. Komut bilgisayardaki mevcut Node/pnpm ortamını bulur; shell ayarlarınızı değiştirmez. Giriş bilgilerinizi yalnızca Expo'nun terminal istemine girin.
+Terminalde `pnpm: command not found` görülürse proje kökünden `bash scripts/expo-login.command` çalıştırın. Komut bilgisayardaki mevcut Node/pnpm ortamını bulur; shell ayarlarınızı değiştirmez. Giriş bilgilerinizi yalnızca Expo'nun kendi giriş ekranına girin.
+
+## Expo Go ile cihaz testi
+
+Mobil uygulama Expo SDK 57, React Native 0.86.3 ve React 19.2.3 kullanır. Telefonda SDK 57 destekli Expo Go kullanın. `bash scripts/expo-start.command` sunucuyu Expo Go modunda başlatır. Telefon ve bilgisayar aynı Wi-Fi ağında olmalı; terminaldeki QR kodunu okutun. Expo Go hesabı istenirse projenin sahibi `aydilekcan` hesabını kullanın. Uygulama içindeki Aldım girişi bundan ayrıdır.

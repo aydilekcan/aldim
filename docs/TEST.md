@@ -16,7 +16,7 @@ SMS/e-posta sağlayıcıları henüz bağlı olmadığından bu iki kanaldan ger
 
 ## Otomatik doğrulama
 
-- 18 test: tarih/para, garanti/servis hatırlatma üretimi, eski veri sahipliği, harcama/yenileme bozuk görsel güvenliği ve geçici oturum zamanlaması.
+- 16 test: tarih/para, garanti/servis hatırlatma üretimi, eski veri sahipliği, harcama/yenileme ve geçici oturum zamanlaması.
 - 11 canlı Supabase testi: iki hesapla oturum, kayıt/hatırlatma atomikliği, RLS, private dosya, eski sürüm çatışması, servis takibi, eşzamanlı ödemenin tekilleşmesi, silinen kaydın geri gelmemesi, tercihler ve iki aylık fatura.
 - Web ve mobil TypeScript, web lint ve Next.js üretim derlemesi başarılı.
 - iOS + Android Hermes üretim paketleri başarılı. iPhone 17 / iOS 26.5 simülatöründe gerçek hesap girişi, webdeki kayıtların görünmesi, fotoğrafın açılması ve 25 KB PDF oluşturularak iOS paylaşım ekranına ulaşılması doğrulandı.
@@ -31,3 +31,11 @@ SMS/e-posta sağlayıcıları henüz bağlı olmadığından bu iki kanaldan ger
 - İzole tarayıcıda sahte ağ yanıtlarıyla yazma, silme, kuruş ekleme, ondalıklı tutar yapıştırma, gelecek tarih uyarısı ve geçerli tarihle uyarının kalkması doğrulandı. Bu görsel test için gerçek kullanıcı verisi kullanılmadı.
 - Sıcak beyaz/koyu mürekkep/kiremit paleti, daha küçük hızlı işlemler, sade harcama özeti ve daha okunaklı form alanları web ve mobile uygulandı. 390 px görünümde yatay taşma yok.
 - Terminalde pnpm bulunmaması için scripts/expo-login.command eklendi. --check ile bu bilgisayarda Node 24.19.0 ve pnpm 11.19.0 doğrulandı; gerçek Expo girişi kullanıcı tarafından tamamlanmalı.
+
+## Expo SDK 57 — 8 Eylül
+
+- SDK 57.0.20, React Native 0.86.3 ve React 19.2.3 uyumu sağlandı.
+- Expo Doctor: 21/21; ortak testler: 16/16; web lint ve web/mobil TypeScript başarılı.
+- SDK 57 ile iOS ve Android Hermes üretim paketleri başarıyla oluşturuldu.
+- Eski Metro ile birlikte image-size bağımlılığı kaldırıldı. Sadece o bağımlılığa ait yama ve iki test temizlendi.
+- Expo Go içinde desteklenmeyen uzaktan push kaydı denenmez; gerçek push için development/production build kullanılır.

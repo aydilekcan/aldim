@@ -1,4 +1,5 @@
 import * as Notifications from "expo-notifications";
+import Constants, { ExecutionEnvironment } from "expo-constants";
 import { Platform } from "react-native";
 import { addDaysIso, isoToDateAt } from "./date-utils";
 
@@ -131,7 +132,7 @@ export async function cancelAllScheduledNotifications(): Promise<void> {
 
 /** Registers this installation for reminders created on any device. */
 export async function registerPushDevice(userId: string): Promise<boolean> {
-  if (Platform.OS === "web") return false;
+  if (Platform.OS === "web" || Constants.executionEnvironment === ExecutionEnvironment.StoreClient) return false;
   try {
     const { supabase } = await import("./supabase");
     if (!supabase) return false;
