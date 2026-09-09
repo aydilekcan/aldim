@@ -90,8 +90,9 @@ export default function RemindersScreen() {
       .filter((r) => {
         if (activeFilter === "all") return true;
         if (typeof activeFilter === "object") {
-          if (activeFilter.kind === "category")
+          if (activeFilter.kind === "category") {
             return r.itemCategory === activeFilter.category;
+          }
           if (activeFilter.kind === "type") return r.type === activeFilter.type;
         }
         return true;
@@ -106,7 +107,7 @@ export default function RemindersScreen() {
       <ScrollView contentContainerStyle={styles.container}>
         <Header
           title="Hatırlatmalar"
-          subtitle="Yaklaşan tüm tarihler — kronolojik."
+          subtitle="Ödemeler, garantiler ve unutmaman gereken tarihler."
         />
 
         <ScrollView
@@ -124,8 +125,8 @@ export default function RemindersScreen() {
                 style={[
                   styles.chip,
                   active && {
-                    backgroundColor: colors.brand[700],
-                    borderColor: colors.brand[700],
+                    backgroundColor: colors.ink[900],
+                    borderColor: colors.ink[900],
                   },
                 ]}
               >
@@ -139,65 +140,68 @@ export default function RemindersScreen() {
           })}
         </ScrollView>
 
-        {!hydrated ? (
-          <View style={styles.skeleton} />
-        ) : filtered.length === 0 ? (
-          <EmptyState
-            icon={
-              <Ionicons
-                name="notifications-outline"
-                size={28}
-                color={colors.brand[700]}
-              />
-            }
-            title="Yaklaşan bir hatırlatma yok"
-            description="Kayıt ekledikçe önemli tarihler burada görünür."
-          />
-        ) : (
-          <View style={{ gap: spacing.sm }}>
-            {filtered.map((r) => (
-              <View key={r.id}>
-                <ReminderRow reminder={r} />
-                <Pressable
-                  onPress={() =>
-                    Alert.alert(
-                      "Tamamla",
-                      ["bill_due", "subscription_renewal"].includes(r.type)
-                        ? "Bu ödeme harcama geçmişine kaydedilecek."
-                        : "Hatırlatma tamamlandı olarak işaretlenecek.",
-                      [
-                        { text: "Vazgeç", style: "cancel" },
-                        {
-                          text: "Tamamla",
-                          onPress: async () => {
-                            try {
-                              await completeReminder(r.id);
-                            } catch (e) {
-                              Alert.alert(
-                                "Kaydedilemedi",
-                                (e as Error).message,
-                              );
-                            }
+        {!hydrated
+          ? <View style={styles.skeleton} />
+          : filtered.length === 0
+          ? (
+            <EmptyState
+              icon={
+                <Ionicons
+                  name="notifications-outline"
+                  size={28}
+                  color={colors.brand[700]}
+                />
+              }
+              title="Yaklaşan bir hatırlatma yok"
+              description="Kayıt ekledikçe önemli tarihler burada görünür."
+            />
+          )
+          : (
+            <View style={{ gap: spacing.sm }}>
+              {filtered.map((r) => (
+                <View key={r.id}>
+                  <ReminderRow reminder={r} />
+                  <Pressable
+                    onPress={() =>
+                      Alert.alert(
+                        "Tamamla",
+                        ["bill_due", "subscription_renewal"].includes(r.type)
+                          ? "Bu ödeme harcama geçmişine kaydedilecek."
+                          : "Hatırlatma tamamlandı olarak işaretlenecek.",
+                        [
+                          { text: "Vazgeç", style: "cancel" },
+                          {
+                            text: "Tamamla",
+                            onPress: async () => {
+                              try {
+                                await completeReminder(r.id);
+                              } catch (e) {
+                                Alert.alert(
+                                  "Kaydedilemedi",
+                                  (e as Error).message,
+                                );
+                              }
+                            },
                           },
-                        },
-                      ],
-                    )
-                  }
-                  style={{ padding: 12, alignItems: "flex-end" }}
-                >
-                  <Text style={{ color: colors.brand[700], fontWeight: "600" }}>
-                    {["bill_due", "subscription_renewal"].includes(r.type)
-                      ? "Ödendi olarak işaretle"
-                      : "Tamamla"}
+                        ],
+                      )}
+                    style={{ padding: 12, alignItems: "flex-end" }}
+                  >
+                    <Text
+                      style={{ color: colors.brand[700], fontWeight: "600" }}
+                    >
+                      {["bill_due", "subscription_renewal"].includes(r.type)
+                        ? "Ödendi olarak işaretle"
+                        : "Tamamla"}
+                    </Text>
+                  </Pressable>
+                  <Text style={styles.category}>
+                    {CATEGORIES[r.itemCategory].label} · {r.itemTitle}
                   </Text>
-                </Pressable>
-                <Text style={styles.category}>
-                  {CATEGORIES[r.itemCategory].label} · {r.itemTitle}
-                </Text>
-              </View>
-            ))}
-          </View>
-        )}
+                </View>
+              ))}
+            </View>
+          )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -211,7 +215,7 @@ const styles = StyleSheet.create({
   chip: {
     paddingHorizontal: spacing.md,
     paddingVertical: 8,
-    borderRadius: radius.pill,
+    borderRadius: radius.sm,
     backgroundColor: colors.white,
     borderWidth: 1,
     borderColor: colors.ink[200],

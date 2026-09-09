@@ -23,7 +23,9 @@ export type PermissionStatus = "granted" | "denied" | "undetermined";
 
 let permissionPromptedThisSession = false;
 
-export async function getNotificationPermissionStatus(): Promise<PermissionStatus> {
+export async function getNotificationPermissionStatus(): Promise<
+  PermissionStatus
+> {
   try {
     const { status } = await Notifications.getPermissionsAsync();
     if (status === "granted") return "granted";
@@ -122,8 +124,49 @@ export async function scheduleBatch(opts: {
   return ids;
 }
 
-export async function cancelAllScheduledNotifications(): Promise<void> {
+export async function scheduleTestNotification(
+  reminder?: { itemId: string; itemTitle: string; dueDate: string },
+): Promise<void> {
+  if (Platform.OS === "web") {
+    throw new Error("Bu testi iPhone veya Android uygulamasında aç.");
+  }
+  if (!(await ensureNotificationPermission())) {
+    throw new Error("Telefon ayarlarından bildirim iznini açıp yeniden dene.");
+  }
+  await Notifications.scheduleNotificationAsync({
+    identifier: "aldim-notification-test",
+    content: {
+      title: "Aldım · Bildirim testi",
+      body: reminder
+        ? `${reminder.itemTitle} için kayıtlı tarih: ${
+          reminder.dueDate.split("-").reverse().join(".")
+        }. Bu bir test hatırlatmasıdır.`
+        : "Bildirim iznin çalışıyor. Bu bir test hatırlatmasıdır.",
+      sound: "default",
+      data: reminder ? { itemId: reminder.itemId } : {},
+    },
+    trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+      seconds: 10,
+      channelId: "default",
+    },
+  });
+}
+
+export async function cancelAllScheduledNotifications(
+  preserveTest = false,
+): Promise<void> {
   try {
+    if (preserveTest) {
+      const scheduled = await Notifications.getAllScheduledNotificationsAsync();
+      await Promise.all(
+        scheduled.filter((n) => n.identifier !== "aldim-notification-test")
+          .map((n) =>
+            Notifications.cancelScheduledNotificationAsync(n.identifier)
+          ),
+      );
+      return;
+    }
     await Notifications.cancelAllScheduledNotificationsAsync();
   } catch {
     /* sessiz */
@@ -132,7 +175,10 @@ export async function cancelAllScheduledNotifications(): Promise<void> {
 
 /** Registers this installation for reminders created on any device. */
 export async function registerPushDevice(userId: string): Promise<boolean> {
-  if (Platform.OS === "web" || Constants.executionEnvironment === ExecutionEnvironment.StoreClient) return false;
+  if (
+    Platform.OS === "web" ||
+    Constants.executionEnvironment === ExecutionEnvironment.StoreClient
+  ) return false;
   try {
     const { supabase } = await import("./supabase");
     if (!supabase) return false;

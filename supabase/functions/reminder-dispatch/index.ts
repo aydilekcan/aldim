@@ -1,4 +1,7 @@
-import { createClient } from "npm:@supabase/supabase-js@2.106.1";
+import { createClient } from "npm:@supabase/supabase-js@2.106.2";
+import { sendNetgsm } from "./netgsm.ts";
+import { dispatchScope } from "./scope.ts";
+import { emailAllowed, emailReady } from "./email-config.ts";
 import { CRON_SECRET_SHA256 } from "./config.ts";
 const client = createClient(
   Deno.env.get("SUPABASE_URL")!,
@@ -40,73 +43,98 @@ Deno.serve(async (req: Request) => {
     .map((x) => x.toString(16).padStart(2, "0"))
     .join("");
   if (hash !== CRON_SECRET_SHA256) return json({ error: "unauthorized" }, 401);
+  const url = new URL(req.url);
+  const dryRun = url.searchParams.get("dry_run") === "true";
+  let scope: ReturnType<typeof dispatchScope>;
+  try {
+    scope = dispatchScope(url);
+  } catch {
+    return json({ error: "invalid_scope" }, 400);
+  }
   const today = day();
   const counts = { accepted: 0, blocked: 0, failed: 0, skipped: 0 };
   const resend = Deno.env.get("RESEND_API_KEY");
   const from = Deno.env.get("REMINDER_FROM_EMAIL");
+  const emailConfig = {
+    key: resend,
+    from,
+    testTo: Deno.env.get("REMINDER_EMAIL_TEST_TO"),
+  };
   const twilioSid = Deno.env.get("TWILIO_ACCOUNT_SID"),
     twilioToken = Deno.env.get("TWILIO_AUTH_TOKEN"),
     twilioFrom = Deno.env.get("TWILIO_FROM_NUMBER");
+  const netgsm = {
+    username: Deno.env.get("NETGSM_USERNAME") ?? "",
+    password: Deno.env.get("NETGSM_PASSWORD") ?? "",
+    header: Deno.env.get("NETGSM_MSGHEADER") ?? "",
+  };
+  const smsProvider = Deno.env.get("SMS_PROVIDER") ?? "netgsm";
+  const smsConfigured = smsProvider === "netgsm"
+    ? !!(netgsm.username && netgsm.password && netgsm.header)
+    : smsProvider === "twilio" && !!(twilioSid && twilioToken && twilioFrom);
   const capabilities = {
     id: true,
     push: true,
-    email: !!(resend && from),
-    sms: !!(twilioSid && twilioToken && twilioFrom),
+    email: emailReady(emailConfig),
+    sms: smsConfigured,
     checked_at: new Date().toISOString(),
   };
   try {
-    const { id: _id, ...channelUpdate } = capabilities;
-    const channelResult = await client
-      .from("notification_channels")
-      .update(channelUpdate)
-      .eq("id", true);
-    if (channelResult.error) throw channelResult.error;
-    // A worker interrupted after provider acceptance must never blindly retry a send.
-    await client
-      .from("notification_deliveries")
-      .update({
-        status: "unknown",
-        error: "Worker interrupted; verify provider before retry.",
-      })
-      .eq("status", "sending")
-      .lt("updated_at", new Date(Date.now() - 15 * 60000).toISOString());
-    const { data: receipts } = await client
-      .from("notification_deliveries")
-      .select("*")
-      .eq("channel", "push")
-      .eq("status", "accepted")
-      .lt("updated_at", new Date(Date.now() - 15 * 60000).toISOString())
-      .limit(100);
-    if (receipts?.length) {
-      const response = await request(
-        "https://exp.host/--/api/v2/push/getReceipts",
-        { ids: receipts.map((r) => r.provider_id) },
-      );
-      if (response.ok) {
-        const result = await response.json();
-        for (const row of receipts) {
-          const receipt = result.data?.[row.provider_id];
-          if (!receipt) continue;
-          await client
-            .from("notification_deliveries")
-            .update({
-              status: receipt.status === "ok" ? "delivered" : "failed",
-              error: receipt.details?.error ?? null,
-              updated_at: new Date().toISOString(),
-            })
-            .eq("id", row.id);
-          if (receipt.details?.error === "DeviceNotRegistered")
+    // Scoped tests do not inspect or mutate other users’ delivery records.
+    if (!dryRun && !scope) {
+      const { id: _id, ...channelUpdate } = capabilities;
+      const channelResult = await client
+        .from("notification_channels")
+        .update(channelUpdate)
+        .eq("id", true);
+      if (channelResult.error) throw channelResult.error;
+      // A worker interrupted after provider acceptance must never blindly retry a send.
+      await client
+        .from("notification_deliveries")
+        .update({
+          status: "unknown",
+          error: "Worker interrupted; verify provider before retry.",
+        })
+        .eq("status", "sending")
+        .lt("updated_at", new Date(Date.now() - 15 * 60000).toISOString());
+      const { data: receipts } = await client
+        .from("notification_deliveries")
+        .select("*")
+        .eq("channel", "push")
+        .eq("status", "accepted")
+        .lt("updated_at", new Date(Date.now() - 15 * 60000).toISOString())
+        .limit(100);
+      if (receipts?.length) {
+        const response = await request(
+          "https://exp.host/--/api/v2/push/getReceipts",
+          { ids: receipts.map((r) => r.provider_id) },
+        );
+        if (response.ok) {
+          const result = await response.json();
+          for (const row of receipts) {
+            const receipt = result.data?.[row.provider_id];
+            if (!receipt) continue;
             await client
-              .from("device_tokens")
-              .update({ enabled: false })
-              .eq("id", row.target_key);
+              .from("notification_deliveries")
+              .update({
+                status: receipt.status === "ok" ? "delivered" : "failed",
+                error: receipt.details?.error ?? null,
+                updated_at: new Date().toISOString(),
+              })
+              .eq("id", row.id);
+            if (receipt.details?.error === "DeviceNotRegistered") {
+              await client
+                .from("device_tokens")
+                .update({ enabled: false })
+                .eq("id", row.target_key);
+            }
+          }
         }
       }
     }
-    const dryRun = new URL(req.url).searchParams.get("dry_run") === "true";
     let candidates = 0;
     for (let page = 0; page < 100; page++) {
-      const { data: reminders, error } = await client
+      let query = client
         .from("reminders")
         .select("*,items!inner(status,deleted_at)")
         .eq("status", "active")
@@ -117,14 +145,19 @@ Deno.serve(async (req: Request) => {
         .lte("due_date", day(new Date(Date.now() + 31 * 86400000)))
         .order("id")
         .range(page * 250, page * 250 + 249);
+      if (scope) {
+        query = query.eq("user_id", scope.userId).eq("id", scope.reminderId);
+      }
+      const { data: reminders, error } = await query;
       if (error) throw error;
       if (!reminders?.length) break;
       for (const reminder of reminders) {
         const offset = Math.round(
           (Date.parse(reminder.due_date) - Date.parse(today)) / 86400000,
         );
-        if (![...(reminder.notify_before_days ?? []), 0].includes(offset))
+        if (![...(reminder.notify_before_days ?? []), 0].includes(offset)) {
           continue;
+        }
         candidates++;
         const { data: settings } = await client
           .from("settings")
@@ -146,30 +179,33 @@ Deno.serve(async (req: Request) => {
           key: string;
           address: string;
         }[] = [];
-        if (settings?.notifications_enabled !== false && devices?.length)
-          for (const device of devices)
+        if (settings?.notifications_enabled !== false && devices?.length) {
+          for (const device of devices) {
             targets.push({
               channel: "push",
               key: device.id,
               address: device.token,
             });
-        else {
+          }
+        } else {
           if (prefs.emailEnabled !== false) {
             const { data } = await client.auth.admin.getUserById(
               reminder.user_id,
             );
-            if (data.user?.email && data.user.email_confirmed_at)
+            if (data.user?.email && data.user.email_confirmed_at) {
               targets.push({
                 channel: "email",
                 key: "email",
                 address: data.user.email,
               });
+            }
           }
           if (
             prefs.smsEnabled === true &&
             /^\+[1-9]\d{7,14}$/.test(prefs.phone ?? "")
-          )
+          ) {
             targets.push({ channel: "sms", key: "sms", address: prefs.phone });
+          }
         }
         if (dryRun) {
           counts.skipped += targets.length;
@@ -201,8 +237,11 @@ Deno.serve(async (req: Request) => {
             .eq("target_key", target.key)
             .single();
           if (deliveryError) throw deliveryError;
-          if (!capabilities[target.channel]) {
-            if (["pending", "blocked"].includes(delivery.status))
+          const configured = target.channel === "email"
+            ? emailAllowed(emailConfig, target.address, !!scope)
+            : capabilities[target.channel];
+          if (!configured) {
+            if (["pending", "blocked"].includes(delivery.status)) {
               await client
                 .from("notification_deliveries")
                 .update({
@@ -211,6 +250,7 @@ Deno.serve(async (req: Request) => {
                   updated_at: new Date().toISOString(),
                 })
                 .eq("id", delivery.id);
+            }
             counts.blocked++;
             continue;
           }
@@ -223,10 +263,9 @@ Deno.serve(async (req: Request) => {
             counts.skipped++;
             continue;
           }
-          const body =
-            offset === 0
-              ? `${reminder.item_title}: ${reminder.title}. Son gün bugün.`
-              : `${reminder.item_title}: ${reminder.title}. ${offset} gün kaldı.`;
+          const body = offset === 0
+            ? `${reminder.item_title}: ${reminder.title}. Son gün bugün.`
+            : `${reminder.item_title}: ${reminder.title}. ${offset} gün kaldı.`;
           let status = "accepted",
             providerId: string | null = null,
             failure: string | null = null;
@@ -246,13 +285,14 @@ Deno.serve(async (req: Request) => {
               const result = await response.json();
               if (!response.ok || result.data?.status !== "ok") {
                 status = "failed";
-                failure =
-                  result.data?.details?.error ?? `Expo HTTP ${response.status}`;
-                if (failure === "DeviceNotRegistered")
+                failure = result.data?.details?.error ??
+                  `Expo HTTP ${response.status}`;
+                if (failure === "DeviceNotRegistered") {
                   await client
                     .from("device_tokens")
                     .update({ enabled: false })
                     .eq("id", target.key);
+                }
               } else providerId = result.data.id;
             } else if (target.channel === "email") {
               const response = await request(
@@ -261,7 +301,8 @@ Deno.serve(async (req: Request) => {
                   from,
                   to: [target.address],
                   subject: "Aldım · " + reminder.title,
-                  text: `${body}\n\nKaydını aç: https://aldim.vercel.app/app/items/${reminder.item_id}\n\nHatırlatma tercihlerini Aldım ayarlarından değiştirebilirsin.`,
+                  text:
+                    `${body}\n\nKaydını aç: https://aldim.vercel.app/app/items/${reminder.item_id}\n\nHatırlatma tercihlerini Aldım ayarlarından değiştirebilirsin.`,
                 },
                 {
                   Authorization: `Bearer ${resend}`,
@@ -273,6 +314,14 @@ Deno.serve(async (req: Request) => {
                 status = "failed";
                 failure = `Resend HTTP ${response.status}`;
               } else providerId = result.id;
+            } else if (smsProvider === "netgsm") {
+              const result = await sendNetgsm(netgsm, {
+                to: target.address,
+                text: `Aldım: ${body} aldim.vercel.app`,
+              });
+              status = result.status;
+              providerId = result.providerId;
+              failure = result.failure;
             } else {
               const form = new URLSearchParams({
                 To: target.address,
@@ -284,7 +333,9 @@ Deno.serve(async (req: Request) => {
                 {
                   method: "POST",
                   headers: {
-                    Authorization: `Basic ${btoa(`${twilioSid}:${twilioToken}`)}`,
+                    Authorization: `Basic ${
+                      btoa(`${twilioSid}:${twilioToken}`)
+                    }`,
                     "Content-Type": "application/x-www-form-urlencoded",
                   },
                   body: form,

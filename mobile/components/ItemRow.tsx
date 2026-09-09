@@ -3,7 +3,12 @@ import { useRouter } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Badge } from "./Badge";
 import { CATEGORIES } from "../lib/categories";
-import { daysUntil, formatDateTR, humanizeDaysLeft } from "../lib/date-utils";
+import { itemAmount } from "../../shared/domain";
+import {
+  daysUntil,
+  formatCurrencyTRY,
+  humanizeDaysLeft,
+} from "../lib/date-utils";
 import { colors, fontSize, radius, spacing } from "../lib/theme";
 import type { Tone } from "../lib/theme";
 import type { AldimItem, Reminder } from "../lib/types";
@@ -65,9 +70,11 @@ export function ItemRow({
   const spec = CATEGORIES[item.category];
   const next = nextReminder(reminders, item.id);
   const sub = subtitle(item);
+  const amount = itemAmount(item);
 
   return (
     <Pressable
+      accessibilityRole="button"
       onPress={() => router.push(`/item/${item.id}`)}
       style={({ pressed }) => [styles.card, pressed && { opacity: 0.92 }]}
     >
@@ -80,29 +87,34 @@ export function ItemRow({
             <Text style={styles.title} numberOfLines={1}>
               {item.title}
             </Text>
-            <Badge tone="neutral">{spec.label}</Badge>
           </View>
-          {sub.length > 0 && (
-            <Text style={styles.sub} numberOfLines={1}>
-              {sub}
-            </Text>
-          )}
+          <Text style={styles.sub} numberOfLines={1}>
+            {[spec.label, sub].filter(Boolean).join(" · ")}
+          </Text>
+        </View>
+        <View style={styles.price}>
+          <Text style={styles.priceText} numberOfLines={1} adjustsFontSizeToFit>
+            {amount > 0 ? formatCurrencyTRY(amount) : "—"}
+          </Text>
+          <Text style={styles.priceHint}>
+            {item.category === "subscription" ? "Dönem tutarı" : "Kayıt tutarı"}
+          </Text>
         </View>
       </View>
 
       <View style={styles.footer}>
-        {next ? (
-          <View style={styles.nextRow}>
-            <Badge tone={toneFor(daysUntil(next.dueDate))} dot>
-              {humanizeDaysLeft(next.dueDate)}
-            </Badge>
-            <Text style={styles.subtle} numberOfLines={1}>
-              {next.title} · {formatDateTR(next.dueDate)}
-            </Text>
-          </View>
-        ) : (
-          <Text style={styles.subtle}>Yaklaşan hatırlatma yok</Text>
-        )}
+        {next
+          ? (
+            <View style={styles.nextRow}>
+              <Badge tone={toneFor(daysUntil(next.dueDate))} dot>
+                {humanizeDaysLeft(next.dueDate)}
+              </Badge>
+              <Text style={styles.subtle} numberOfLines={1}>
+                {next.title}
+              </Text>
+            </View>
+          )
+          : <Text style={styles.subtle}>Yaklaşan hatırlatma yok</Text>}
         {item.documents.length > 0 && (
           <View style={styles.docs}>
             <Ionicons name="folder-outline" size={12} color={colors.ink[500]} />
@@ -116,13 +128,20 @@ export function ItemRow({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.white,
-    borderWidth: 1,
-    borderColor: colors.ink[100],
-    borderRadius: radius.lg,
-    padding: spacing.md,
+    backgroundColor: "transparent",
+    borderBottomWidth: 1,
+    borderColor: colors.ink[200],
+    paddingVertical: spacing.lg,
     gap: spacing.sm,
   },
+  price: { alignItems: "flex-end", maxWidth: "42%", gap: 5 },
+  priceText: {
+    fontSize: 15,
+    fontWeight: "600",
+    fontVariant: ["tabular-nums"],
+    color: colors.ink[900],
+  },
+  priceHint: { fontSize: 10, color: colors.ink[500] },
   row: {
     flexDirection: "row",
     gap: spacing.md,
@@ -132,7 +151,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: radius.md,
-    backgroundColor: colors.brand[50],
+    backgroundColor: colors.ink[100],
     alignItems: "center",
     justifyContent: "center",
   },

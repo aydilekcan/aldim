@@ -77,7 +77,10 @@ Push için Expo projesi `f5bfa130-617b-4542-b5be-1b45a6f46ac5` kullanılır. App
 E-posta ve SMS sağlayıcıları bağlı değildir. Etkinleştirmek için Supabase Edge Function secrets alanına şu değerleri ekleyin:
 
 - E-posta: `RESEND_API_KEY`, `REMINDER_FROM_EMAIL` (doğrulanmış gönderici).
-- SMS: `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER`.
+- SMS (Netgsm): `SMS_PROVIDER=netgsm`, `NETGSM_USERNAME`, `NETGSM_PASSWORD`, `NETGSM_MSGHEADER`.
+- Alternatif Twilio yalnızca `SMS_PROVIDER=twilio` ile seçilir.
+
+Hesap, alan adı, iPhone kurulumu ve kapsamlı test adımları: [Bildirim kurulumu](docs/NOTIFICATIONS.md).
 
 Dağıtıcının sonraki çalışması kanal durumunu günceller. SMS telefonu uluslararası `+905xxxxxxxxx` biçiminde girilir. Gönderim tercihleri kullanıcı tarafından değiştirilebilir.
 

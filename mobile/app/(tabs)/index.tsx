@@ -2,11 +2,11 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import {
   Pressable,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
   View,
-  RefreshControl,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAldimStore } from "../../lib/store";
@@ -20,31 +20,26 @@ import type { ItemCategory } from "../../lib/types";
 const QUICK: {
   category: ItemCategory;
   title: string;
-  description: string;
   icon: keyof typeof Ionicons.glyphMap;
 }[] = [
   {
     category: "electronics",
     title: "Ürün ekle",
-    description: "Fatura ve garantisini sakla",
     icon: "phone-portrait-outline",
   },
   {
     category: "home_bill",
     title: "Fatura ekle",
-    description: "Son ödeme gününü unutma",
     icon: "receipt-outline",
   },
   {
     category: "subscription",
     title: "Abonelik ekle",
-    description: "Düzenli ödemelerini gör",
     icon: "card-outline",
   },
   {
     category: "vehicle",
     title: "Araç ekle",
-    description: "Bakım ve muayeneyi hatırla",
     icon: "car-outline",
   },
 ];
@@ -94,7 +89,7 @@ export default function HomeScreen() {
         </Text>
         <Text style={s.title}>Genel bakış</Text>
         <Text style={s.description}>
-          Harcamaların ve sıradaki önemli tarihler.
+          Bu ay ne harcadın, sırada ne var?
         </Text>
         {syncError && (
           <View style={s.error}>
@@ -112,7 +107,9 @@ export default function HomeScreen() {
             <Text style={s.heroLabel}>Bu ayki harcaman</Text>
             <Ionicons name="arrow-forward" size={21} color={colors.ink[500]} />
           </View>
-          <Text style={s.amount}>{formatCurrencyTRY(summary.thisMonth)}</Text>
+          <Text style={s.amount} adjustsFontSizeToFit numberOfLines={1}>
+            {formatCurrencyTRY(summary.thisMonth)}
+          </Text>
           <Text style={s.heroHint}>
             Alışverişlerin ve kaydettiğin ödemelerin toplamı
           </Text>
@@ -138,6 +135,24 @@ export default function HomeScreen() {
             <Text style={s.metricLabel}>Belgeleri aç</Text>
           </Pressable>
         </View>
+        <View style={s.sectionRow}>
+          <Text style={s.section}>Takip edilecekler</Text>
+          <Pressable onPress={() => router.push("/(tabs)/reminders")}>
+            <Text style={s.link}>Tümünü gör →</Text>
+          </Pressable>
+        </View>
+        {upcoming.length
+          ? (
+            <View>
+              {upcoming.map((r) => <ReminderRow key={r.id} reminder={r} />)}
+            </View>
+          )
+          : (
+            <EmptyState
+              title="Yaklaşan bir tarih yok"
+              description="Kayıtlarına eklediğin önemli tarihler burada görünür."
+            />
+          )}
         <Text style={s.section}>Hızlı ekle</Text>
         <View style={s.grid}>
           {QUICK.map((q) => (
@@ -151,24 +166,6 @@ export default function HomeScreen() {
             </Pressable>
           ))}
         </View>
-        <View style={s.sectionRow}>
-          <Text style={s.section}>Yaklaşan tarihler</Text>
-          <Pressable onPress={() => router.push("/(tabs)/reminders")}>
-            <Text style={s.link}>Tümünü gör →</Text>
-          </Pressable>
-        </View>
-        {upcoming.length ? (
-          <View style={{ gap: 9 }}>
-            {upcoming.map((r) => (
-              <ReminderRow key={r.id} reminder={r} />
-            ))}
-          </View>
-        ) : (
-          <EmptyState
-            title="Yaklaşan bir tarih yok"
-            description="Kayıtlarına eklediğin önemli tarihler burada görünür."
-          />
-        )}
         {items.length > 0 && (
           <>
             <View style={s.sectionRow}>
@@ -177,7 +174,7 @@ export default function HomeScreen() {
                 <Text style={s.link}>Tümünü gör →</Text>
               </Pressable>
             </View>
-            <View style={{ gap: 9 }}>
+            <View>
               {items.slice(0, 3).map((i) => (
                 <ItemRow key={i.id} item={i} reminders={reminders} />
               ))}
@@ -207,17 +204,22 @@ const s = StyleSheet.create({
     letterSpacing: -2,
     color: colors.ink[900],
   },
-  settings: { backgroundColor: colors.white, padding: 11, borderRadius: 12 },
+  settings: {
+    padding: 11,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: colors.ink[200],
+  },
   eyebrow: {
     fontSize: 13,
     letterSpacing: 0,
     color: colors.ink[500],
     fontWeight: "400",
-    marginTop: 24,
-    marginBottom: 12,
+    marginTop: 20,
+    marginBottom: 8,
   },
   title: {
-    fontSize: 27,
+    fontSize: 28,
     fontWeight: "700",
     letterSpacing: -0.8,
     color: colors.ink[900],
@@ -240,7 +242,8 @@ const s = StyleSheet.create({
   amount: {
     color: colors.ink[900],
     fontWeight: "600",
-    fontSize: 38,
+    fontSize: 42,
+    fontVariant: ["tabular-nums"],
     marginTop: 16,
     letterSpacing: -1,
   },
@@ -276,45 +279,15 @@ const s = StyleSheet.create({
   quick: {
     width: "48%",
     flexGrow: 1,
-    backgroundColor: colors.white,
-    borderWidth: 1,
+    backgroundColor: "transparent",
+    borderBottomWidth: 1,
     borderColor: colors.ink[200],
-    borderRadius: 6,
     padding: 14,
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
   },
-  quickTop: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 14,
-  },
-  quickIcon: {
-    width: 38,
-    height: 38,
-    borderRadius: 12,
-    backgroundColor: colors.brand[50],
-    alignItems: "center",
-    justifyContent: "center",
-  },
   quickTitle: { fontSize: 14, fontWeight: "700", color: colors.ink[900] },
-  quickDescription: {
-    fontSize: 11,
-    color: colors.ink[500],
-    lineHeight: 18,
-    marginTop: 6,
-  },
-  tip: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 13,
-    padding: 18,
-    borderRadius: 15,
-    backgroundColor: "#EDF3E3",
-    marginTop: 27,
-  },
   error: {
     padding: 15,
     backgroundColor: colors.danger[50],

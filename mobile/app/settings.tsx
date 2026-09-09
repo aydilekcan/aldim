@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Alert, ScrollView, Text, Switch, View, Linking } from "react-native";
+import { useState } from "react";
+import { Alert, Linking, ScrollView, Switch, Text, View } from "react-native";
 import { File, Paths } from "expo-file-system";
 import * as Sharing from "expo-sharing";
 import { Card, CardTitle } from "../components/Card";
@@ -7,17 +7,20 @@ import { Button } from "../components/Button";
 import { Field, TextField } from "../components/Field";
 import { useAldimStore } from "../lib/store";
 import { useAuth } from "../lib/auth";
+import type { AppSettings } from "../lib/types";
 import {
-  ensureNotificationPermission,
   cancelAllScheduledNotifications,
+  ensureNotificationPermission,
+  scheduleTestNotification,
 } from "../lib/notifications";
+import { daysUntil } from "../lib/date-utils";
 import { colors } from "../lib/theme";
 export default function SettingsScreen() {
   const store = useAldimStore();
   const { user, signOut } = useAuth();
-  const [settings, setSettings] = useState(store.settings);
+  const [draft, setDraft] = useState<Partial<AppSettings>>({});
+  const settings = { ...store.settings, ...draft };
   const [busy, setBusy] = useState(false);
-  useEffect(() => setSettings(store.settings), [store.settings]);
   const run = async (action: () => Promise<unknown>, message?: string) => {
     setBusy(true);
     try {
@@ -47,8 +50,8 @@ export default function SettingsScreen() {
           {store.syncStatus === "synced"
             ? "Kayıtların güncel."
             : store.syncStatus === "syncing"
-              ? "Kayıtlar güncelleniyor…"
-              : "Bağlantını kontrol edip yeniden dene."}
+            ? "Kayıtlar güncelleniyor…"
+            : "Bağlantını kontrol edip yeniden dene."}
         </Text>
         {store.syncError && (
           <Text style={{ marginBottom: 12, color: colors.danger[600] }}>
@@ -65,8 +68,7 @@ export default function SettingsScreen() {
       <Card>
         <CardTitle>Hatırlatma tercihlerin</CardTitle>
         <Text style={{ fontSize: 12, lineHeight: 20, color: colors.ink[500] }}>
-          E-posta:{" "}
-          {store.channels.email
+          E-posta: {store.channels.email
             ? "Etkin"
             : "Gönderim hizmeti kurulumu bekleniyor"}
           {"\n"}SMS:{" "}
@@ -93,6 +95,7 @@ export default function SettingsScreen() {
             </Text>
             <Switch
               accessibilityLabel={title}
+              disabled={busy}
               value={Boolean(settings[key as keyof typeof settings])}
               trackColor={{ true: colors.brand[500] }}
               onValueChange={async (value) => {
@@ -114,7 +117,7 @@ export default function SettingsScreen() {
                   );
                   return;
                 }
-                setSettings((s) => ({ ...s, [key]: value }));
+                setDraft((s) => ({ ...s, [key]: value }));
               }}
             />
           </View>
@@ -135,7 +138,8 @@ export default function SettingsScreen() {
           <Field label="Telefon">
             <TextField
               value={settings.phone ?? ""}
-              onChangeText={(phone) => setSettings((s) => ({ ...s, phone }))}
+              editable={!busy}
+              onChangeText={(phone) => setDraft((s) => ({ ...s, phone }))}
               keyboardType="phone-pad"
               placeholder="+905xxxxxxxxx"
             />
@@ -146,10 +150,38 @@ export default function SettingsScreen() {
           loading={busy}
           onPress={() =>
             void run(
-              () => store.updateSettings(settings),
+              async () => {
+                await store.updateSettings(draft);
+                setDraft({});
+              },
               "Tercihlerin kaydedildi.",
-            )
-          }
+            )}
+        />
+      </Card>
+      <Card>
+        <CardTitle>Bildirimini dene</CardTitle>
+        <Text
+          style={{ color: colors.ink[500], lineHeight: 21, marginVertical: 14 }}
+        >
+          Telefonuna 10 saniye sonra bir test hatırlatması bırak. Bu test
+          cihazda çalışır; sunucudan gönderimi, SMS veya e-postayı sınamaz.
+        </Text>
+        <Button
+          title="Test bildirimi oluştur"
+          variant="outline"
+          loading={busy}
+          onPress={() =>
+            void run(
+              async () => {
+                const reminder =
+                  store.reminders.filter((r) =>
+                    r.status === "active" && daysUntil(r.dueDate) >= 0
+                  )
+                    .sort((a, b) => a.dueDate.localeCompare(b.dueDate))[0];
+                await scheduleTestNotification(reminder);
+              },
+              "Test kuruldu. Uygulamayı arka plana al; yaklaşık 10 saniye içinde bildirimi görmelisin.",
+            )}
         />
       </Card>
       <Card>
@@ -182,8 +214,7 @@ export default function SettingsScreen() {
               await Sharing.shareAsync(file.uri, {
                 mimeType: "application/json",
               });
-            })
-          }
+            })}
         />
       </Card>
       <Button
@@ -194,8 +225,7 @@ export default function SettingsScreen() {
           void run(async () => {
             await cancelAllScheduledNotifications();
             await signOut();
-          })
-        }
+          })}
       />
     </ScrollView>
   );

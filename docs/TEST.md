@@ -39,3 +39,13 @@ SMS/e-posta sağlayıcıları henüz bağlı olmadığından bu iki kanaldan ger
 - SDK 57 ile iOS ve Android Hermes üretim paketleri başarıyla oluşturuldu.
 - Eski Metro ile birlikte image-size bağımlılığı kaldırıldı. Sadece o bağımlılığa ait yama ve iki test temizlendi.
 - Expo Go içinde desteklenmeyen uzaktan push kaydı denenmez; gerçek push için development/production build kullanılır.
+
+## Bildirim entegrasyonu ve mobil düzenleme — 9 Eylül
+
+- Ortak otomatik testler 21/21: Netgsm kabul/hata/belirsiz yanıtları, test alıcısı sınırı ve tek hatırlatma kapsamı dahil. Web/mobil TypeScript ve değişen mobil dosyalarda ESLint başarılı. Deno Edge Function tip kontrolü başarılı.
+- iOS ve Android Hermes JavaScript üretim paketleri oluşturuldu. Bunlar imzalı IPA/APK değildir; iPhone cihaz kurulumu Apple oturumu, cihaz kaydı ve EAS derlemesi bekliyor.
+- Netgsm REST v2 entegrasyonu Supabase reminder-dispatch v4 ile yayımlandı; Netgsm hesap bilgileri henüz eklenmedi.
+- Resend yalnızca test hesabına gönderim modunda bağlandı. Hesap sahibinin Netflix hatırlatması için kapsamlı POST 200, tek e-posta kabulü ve Resend panelinde Delivered durumu 9 Eylül'de doğrulandı. Normal cron test göndericisiyle e-posta göndermez; üretim için doğrulanmış alan adı gerekir.
+- Kayıt satırlarında tutar, kayıtlarda/belgelerde arama, sade tarih satırları ve ana sayfada daha yukarıda hatırlatmalar. Ayarlarda 10 saniyelik cihaz bildirim testi eklendi. Bu test gerçek telefonda henüz doğrulanmadı.
+- Expo development/preview/production ortamlarına yalnızca public Supabase bağlantı bilgileri eklendi. Sunucu anahtarları mobil pakette bulunmaz.
+- Son ekranların görsel ve cihaz üstü testi hâlâ bekliyor; önceki sürümün simülatör kontrolleri bu yeni tasarımın onayı sayılmaz.

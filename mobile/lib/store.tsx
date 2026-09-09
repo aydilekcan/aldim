@@ -15,7 +15,6 @@ import {
   EMPTY_SNAPSHOT,
   type Snapshot,
 } from "../../shared/api";
-import { DEFAULT_SETTINGS } from "../../shared/domain";
 import type {
   AldimItem,
   AldimDocument,
@@ -106,7 +105,8 @@ export function AldimStoreProvider({
   const owner = user?.id;
   const [snapshot, setSnapshot] = useState<Snapshot>(EMPTY_SNAPSHOT);
   const snapshotRef = useRef(snapshot);
-  const [hydrated, setHydrated] = useState(false);
+  // UserStore remounts for each owner, including the signed-out state.
+  const [hydrated, setHydrated] = useState(!owner);
   const [syncStatus, setSyncStatus] = useState<SyncStatus>("idle");
   const [syncError, setSyncError] = useState<string>();
   const [lastSyncedAt, setLastSyncedAt] = useState<string>();
@@ -114,9 +114,11 @@ export function AldimStoreProvider({
   const generation = useRef(0);
   useEffect(() => {
     active.current = true;
+    // Invalidate in-flight requests on cleanup using the same counter object.
+    const requests = generation;
     return () => {
       active.current = false;
-      generation.current++;
+      requests.current++;
     };
   }, []);
   const apply = useCallback((next: Snapshot) => {
@@ -150,10 +152,7 @@ export function AldimStoreProvider({
     }
   }, [owner, apply]);
   useEffect(() => {
-    if (!owner) {
-      setHydrated(true);
-      return;
-    }
+    if (!owner) return;
     let cancelled = false;
     void (async () => {
       const raw = await AsyncStorage.getItem(`aldim:user:${owner}:state:v3`);
@@ -185,7 +184,7 @@ export function AldimStoreProvider({
     let total = 0,
       skipped = 0;
     const data = snapshotRef.current;
-    await cancelAllScheduledNotifications();
+    await cancelAllScheduledNotifications(true);
     if (
       !data.settings.notificationsEnabled ||
       (await getNotificationPermissionStatus()) !== "granted"
