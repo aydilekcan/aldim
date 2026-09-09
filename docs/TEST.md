@@ -46,6 +46,14 @@ SMS/e-posta sağlayıcıları henüz bağlı olmadığından bu iki kanaldan ger
 - iOS ve Android Hermes JavaScript üretim paketleri oluşturuldu. Bunlar imzalı IPA/APK değildir; iPhone cihaz kurulumu Apple oturumu, cihaz kaydı ve EAS derlemesi bekliyor.
 - Netgsm REST v2 entegrasyonu Supabase reminder-dispatch v4 ile yayımlandı; Netgsm hesap bilgileri henüz eklenmedi.
 - Resend yalnızca test hesabına gönderim modunda bağlandı. Hesap sahibinin Netflix hatırlatması için kapsamlı POST 200, tek e-posta kabulü ve Resend panelinde Delivered durumu 9 Eylül'de doğrulandı. Normal cron test göndericisiyle e-posta göndermez; üretim için doğrulanmış alan adı gerekir.
-- Kayıt satırlarında tutar, kayıtlarda/belgelerde arama, sade tarih satırları ve ana sayfada daha yukarıda hatırlatmalar. Ayarlarda 10 saniyelik cihaz bildirim testi eklendi. Bu test gerçek telefonda henüz doğrulanmadı.
+- Kayıt satırlarında tutar, kayıtlarda/belgelerde arama, sade tarih satırları ve ana sayfada daha yukarıda hatırlatmalar. Ayarlarda 10 saniyelik cihaz bildirim testi eklendi. Kullanıcı 9 Eylül'de test bildiriminin gerçek telefonuna geldiğini doğruladı; bu cihaz içi testtir, uzaktan push teslimini doğrulamaz.
 - Expo development/preview/production ortamlarına yalnızca public Supabase bağlantı bilgileri eklendi. Sunucu anahtarları mobil pakette bulunmaz.
 - Son ekranların görsel ve cihaz üstü testi hâlâ bekliyor; önceki sürümün simülatör kontrolleri bu yeni tasarımın onayı sayılmaz.
+- Kullanıcı 9 Eylül'de Netflix e-postasının gelen kutusuna ulaştığını ekran görüntüsüyle doğruladı. E-posta şu an düz metindir; tasarım çalışması kullanıcının isteğiyle sonraya bırakıldı. Yayın öncesi işler: [Yayın listesi](RELEASE.md).
+
+## iOS imzalama hazırlığı — 9 Eylül
+
+- Kullanıcının Apple oturumu CLI üzerinden başarıyla geri yüklendi. Aldım için Apple Distribution Certificate oluşturuldu.
+- APNs anahtarı oluşturuldu ve `com.aldim.app` / Expo `aldim-mobile` projesine atandı. Gizli anahtarlar kaynak koda eklenmedi.
+- İlk EAS iOS derlemesi cihaz kaydı aşamasında bekliyor. Henüz imzalı IPA üretilmedi.
+- Kullanılmayan EAS Update kanal ayarları kaldırıldı; proje expo-updates kullanmadığından test derlemesinde gereksiz kurulum istemi çıkmamalı.
