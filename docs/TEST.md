@@ -12,7 +12,7 @@ Son doğrulama: 7 Eylül 2026. Vercel production yayını READY; Supabase hatır
 6. Kayıt düzenle/arşivle/sil. Diğer cihazda yenilediğinde değişikliği kontrol et.
 7. Gerçek iPhone/Android development build üzerinde kamera, PDF paylaşımı, bildirim izni ve bildirime dokunarak doğru kayda açılmayı dene.
 
-SMS/e-posta sağlayıcıları henüz bağlı olmadığından bu iki kanaldan gerçek gönderim beklenmemelidir. Expo EAS hesabına giriş ve APNs/FCM kurulumu tamamlanmadan uzaktan push için uçtan uca teslim testi yapılamaz. Ana README kurulum adımlarını içerir.
+Güncel kanal durumu (10 Eylül): Resend test e-postası gerçek gelen kutusunda doğrulandı; herkese gönderim için alan adı gerekiyor. SMS hesabı ve Android FCM kurulumu bekliyor. iOS imzalama/APNs ve ilk cihaz derlemesi tamamlandı; telefona kurulum ve uzaktan push teslim testi sıradaki adım. Ayrıntılar aşağıdaki tarihli test kayıtlarında.
 
 ## Otomatik doğrulama
 
@@ -55,5 +55,14 @@ SMS/e-posta sağlayıcıları henüz bağlı olmadığından bu iki kanaldan ger
 
 - Kullanıcının Apple oturumu CLI üzerinden başarıyla geri yüklendi. Aldım için Apple Distribution Certificate oluşturuldu.
 - APNs anahtarı oluşturuldu ve `com.aldim.app` / Expo `aldim-mobile` projesine atandı. Gizli anahtarlar kaynak koda eklenmedi.
-- İlk EAS iOS derlemesi cihaz kaydı aşamasında bekliyor. Henüz imzalı IPA üretilmedi.
+- Cihaz kaydı ve imzalı IPA bu hazırlığın ardından 10 Eylül'de tamamlandı; sonuç aşağıda.
 - Kullanılmayan EAS Update kanal ayarları kaldırıldı; proje expo-updates kullanmadığından test derlemesinde gereksiz kurulum istemi çıkmamalı.
+
+## İmzalı iPhone test uygulaması — 10 Eylül
+
+- Kullanıcının iPhone'u Ad Hoc profile dahil edildi. Apple dağıtım sertifikası ve APNs yapılandırması EAS tarafından doğrulandı.
+- EAS development build `d7be3a22-f4a9-4542-97c8-54f2fabd08e1`: **FINISHED**, 10 Eylül 2026 10:56 Türkiye saati. Sürüm 0.1.0, derleme 1; kaynak commit `07f4a16`.
+- [iPhone kurulum sayfası](https://expo.dev/accounts/aydilekcan/projects/aldim-mobile/builds/d7be3a22-f4a9-4542-97c8-54f2fabd08e1). Bu bir development build; App Store/TestFlight yayını değildir ve açılış için yerel geliştirme sunucusu gerekir.
+- Metro `--dev-client --lan` ile başlatıldı. Doğru Expo project ID doğrulandı; iOS geliştirme paketi HTTP 200 ile derlendi (11.097.562 bayt).
+- Kullanıcının hesabında kurulum öncesi kayıtlı push cihazı bulunmadığı doğrulandı. Telefona kurulum, hesap girişi, bildirim izni, tek cihaza uzaktan test ve bildirime dokunarak Netflix kaydını açma henüz doğrulanmadı.
+- Netflix'in gerçek ödeme tarihi test için değiştirilmedi. Geçmiş tarihli kaydı normal cron ile zorlamak yerine açıkça test olarak etiketlenmiş tek cihaz gönderimi yapılmalı.
