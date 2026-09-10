@@ -12,7 +12,7 @@ Son doğrulama: 7 Eylül 2026. Vercel production yayını READY; Supabase hatır
 6. Kayıt düzenle/arşivle/sil. Diğer cihazda yenilediğinde değişikliği kontrol et.
 7. Gerçek iPhone/Android development build üzerinde kamera, PDF paylaşımı, bildirim izni ve bildirime dokunarak doğru kayda açılmayı dene.
 
-Güncel kanal durumu (10 Eylül): Resend test e-postası gerçek gelen kutusunda doğrulandı; herkese gönderim için alan adı gerekiyor. SMS hesabı ve Android FCM kurulumu bekliyor. iOS imzalama/APNs ve ilk cihaz derlemesi tamamlandı; telefona kurulum ve uzaktan push teslim testi sıradaki adım. Ayrıntılar aşağıdaki tarihli test kayıtlarında.
+Güncel kanal durumu (10 Eylül): Resend test e-postası gerçek gelen kutusunda doğrulandı; herkese gönderim için alan adı gerekiyor. SMS hesabı ve Android FCM kurulumu bekliyor. İmzalı iPhone uygulamasında uzaktan push teslimi ve bildirime dokunarak Netflix kaydını açma doğrulandı. Ayrıntılar aşağıdaki tarihli test kayıtlarında.
 
 ## Otomatik doğrulama
 
@@ -64,5 +64,8 @@ Güncel kanal durumu (10 Eylül): Resend test e-postası gerçek gelen kutusunda
 - EAS development build `d7be3a22-f4a9-4542-97c8-54f2fabd08e1`: **FINISHED**, 10 Eylül 2026 10:56 Türkiye saati. Sürüm 0.1.0, derleme 1; kaynak commit `07f4a16`.
 - [iPhone kurulum sayfası](https://expo.dev/accounts/aydilekcan/projects/aldim-mobile/builds/d7be3a22-f4a9-4542-97c8-54f2fabd08e1). Bu bir development build; App Store/TestFlight yayını değildir ve açılış için yerel geliştirme sunucusu gerekir.
 - Metro `--dev-client --lan` ile başlatıldı. Doğru Expo project ID doğrulandı; iOS geliştirme paketi HTTP 200 ile derlendi (11.097.562 bayt).
-- Kullanıcının hesabında kurulum öncesi kayıtlı push cihazı bulunmadığı doğrulandı. Telefona kurulum, hesap girişi, bildirim izni, tek cihaza uzaktan test ve bildirime dokunarak Netflix kaydını açma henüz doğrulanmadı.
-- Netflix'in gerçek ödeme tarihi test için değiştirilmedi. Geçmiş tarihli kaydı normal cron ile zorlamak yerine açıkça test olarak etiketlenmiş tek cihaz gönderimi yapılmalı.
+- Kullanıcı imzalı uygulamaya giriş yaptı; yalnızca kendi hesabına ait etkin iOS cihaz kaydı oluştu.
+- Supabase üzerinden sadece bu cihaza, etkin bildirim tercihi ve Netflix kayıt sahipliği kontrol edilerek tek uzaktan test gönderildi. Başlık: “Aldım · Uzaktan bildirim testi”. Netflix'in gerçek ödeme tarihi değiştirilmedi.
+- pg_net istek `42`: HTTP 200, Expo ticket `01a08a5c-6062-71db-8050-07a36c0d7be3`, status `ok`. Aynı ticket için Expo receipt `ok`: Apple bildirim servisine iletim başarılı.
+- Kullanıcı açıkça “Geldi ve Netflix açıldı” yanıtıyla telefonda teslimi ve doğru kayda yönlendirmeyi doğruladı. Uygulamanın zorla kapatılması/soğuk açılış senaryosu ayrıca doğrulanmadı.
+- Bu doğrudan tek cihaz testi normal tarih/offset cron akışını veya notification_deliveries kaydını sınamaz; yeni bir otomatik zamanlama testi yayın kontrolünde tutulur. Cihaz tokenı sohbet veya kaynak koda yazılmadı.
